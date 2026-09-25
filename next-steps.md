@@ -11,7 +11,9 @@ Keep both. They are different machines.
 
 Do not replace the Cloud Agent install script with the devcontainer image. Cloud Agents do not boot `.devcontainer`. Do not add a Docker daemon to `install.sh` just because Molecule exists. GitHub Actions and the devcontainer are the Molecule runners.
 
-`install.sh` must keep installing `requirements.txt` and `requirements.yml` when those files exist. `requirements.yml` includes `community.docker`, which the Molecule Docker driver imports. The default Cloud Agent image happened to have that collection already. GitHub-hosted runners do not.
+`install.sh` must keep installing `requirements.txt` and `requirements.yml` when those files exist. `requirements.yml` includes `community.docker` and `ansible.posix`. The Molecule Docker driver imports `community.docker.docker_login` and `ansible.posix.synchronize`. The default Cloud Agent image happened to have both collections already. GitHub-hosted runners do not.
+
+Pull request 26 is merged. The environment on `main` still fits next to `.devcontainer/`: `install.sh` follows the requirements files and does not install a Docker daemon. Do not delete `.cursor/` because a devcontainer now exists.
 
 This file is the handoff for a new Cloud Agent that has `CURSOR_UPDATE_ISSUE_TOKEN`.
 Do not change code in `home-assistant`, `gpu-server`, `guardrails`, or `commondevops`.
