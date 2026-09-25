@@ -17,7 +17,7 @@ Platforms: Ubuntu 26.04 and SLES 16.
 
 ## Guardrails
 
-Ansible thresholds are vendored at `docs/guardrails/ansible/` from [pirlruc/guardrails](https://github.com/pirlruc/guardrails) (`ANSIBLE-*`, epic GR-PACK-006). `docs/guardrails/PIN` records the source SHA. CI reads `profile.thresholds.yml` and fails closed when a key is missing. `docs/guardrail-deviations.yml` is empty.
+Ansible thresholds live at `docs/guardrails/ansible/` (`ANSIBLE-*`, epic GR-PACK-006). CI reads `profile.thresholds.yml` and fails closed when a key is missing. `docs/guardrail-deviations.yml` is empty. The same pack was prepared for [pirlruc/guardrails](https://github.com/pirlruc/guardrails); this environment could not push there.
 
 `pirlruc/home-assistant` and `pirlruc/gpu-server` are not visible with the credentials available to this repository, so those trees were not used as role examples.
 
