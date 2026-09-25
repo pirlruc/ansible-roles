@@ -17,6 +17,7 @@ None. SLES package installs use `community.general.zypper` from `requirements.ym
 
 | Name | Default | Description |
 |------|---------|-------------|
+| `docker_apt_suite_override` | `""` | Ubuntu suite when `download.docker.com` has no suite for this release. Empty probes `distribution_release`. |
 | `docker_manage_service` | `true` | Start and enable `docker` when `/run/systemd/system` exists. |
 | `docker_verify_cli` | `true` | Run `docker compose version` after install. |
 | `docker_use_transactional_update` | `false` | Use `transactional-update pkg install` on SLES. |

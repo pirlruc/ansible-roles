@@ -3,6 +3,13 @@ argument_specs:
   main:
     short_description: Install Docker Engine and Compose.
     options:
+      docker_apt_suite_override:
+        type: str
+        required: false
+        default: ""
+        description: >-
+          Apt suite to use when Docker has not published this Ubuntu release yet.
+          Empty uses ansible_facts['distribution_release'] and fails if that suite is missing.
       docker_manage_service:
         type: bool
         required: false

@@ -6,6 +6,7 @@
 ## What landed
 
 - Roles `docker`, `users`, `permissions`, and `group_membership` with empty `dependencies`.
+- Ubuntu Docker install probes `download.docker.com` for the apt suite (`docker_apt_suite_override`), taken from home-assistant's docker role.
 - `playbooks/orchestrate.yml` is the only composition point. It runs `group_membership` again after `docker` so the `docker` group exists first.
 - Molecule scenarios `ubuntu-accounts`, `sles-accounts`, `ubuntu-docker`, `sles-docker`.
 - Vendored Ansible guardrail pack at `docs/guardrails/ansible/` (org pack authored in `pirlruc/guardrails` as GR-PACK-006).

@@ -1,4 +1,5 @@
 ---
+docker_apt_suite_override: ""
 docker_manage_service: true
 docker_verify_cli: true
 docker_use_transactional_update: false
