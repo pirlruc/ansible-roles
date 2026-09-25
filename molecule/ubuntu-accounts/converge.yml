@@ -1,0 +1,44 @@
+---
+- name: Converge account roles independently
+  hosts: all
+  become: true
+  tasks:
+    - name: Create a group the membership role must not create
+      ansible.builtin.group:
+        name: roleusers
+        state: present
+
+    - name: Create accounts
+      ansible.builtin.import_role:
+        name: users
+      vars:
+        users_accounts:
+          - name: roleuser
+            comment: Role test
+            shell: /bin/bash
+
+    - name: Apply permissions
+      ansible.builtin.import_role:
+        name: permissions
+      vars:
+        permissions_paths:
+          - path: /var/tmp/roleuser-data
+            state: directory
+            mode: "0750"
+            owner: roleuser
+            group: roleuser
+        permissions_sudoers:
+          - name: roleuser-true
+            user: roleuser
+            commands:
+              - /usr/bin/true
+            nopasswd: true
+
+    - name: Associate the account with the existing group
+      ansible.builtin.import_role:
+        name: group_membership
+      vars:
+        group_membership_entries:
+          - group: roleusers
+            members:
+              - roleuser

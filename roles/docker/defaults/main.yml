@@ -1,0 +1,6 @@
+---
+docker_manage_service: true
+docker_verify_cli: true
+docker_use_transactional_update: false
+docker_suse_baseurl: https://download.opensuse.org/repositories/Virtualization:/containers/16.0/
+docker_suse_gpgkey: https://download.opensuse.org/repositories/Virtualization:/containers/16.0/repodata/repomd.xml.key

@@ -1,0 +1,106 @@
+---
+- name: Require Ubuntu 26.04 or SLES 16
+  ansible.builtin.assert:
+    that:
+      - >-
+        (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_version'] is version('26.04', '=='))
+        or (ansible_facts['distribution'] == 'SLES' and ansible_facts['distribution_major_version'] | int == 16)
+    fail_msg: >-
+      docker supports Ubuntu 26.04 and SLES 16 only
+      (found {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}).
+
+- name: Load platform package lists
+  ansible.builtin.include_vars: "{{ ansible_facts['distribution'] }}.yml"
+
+- name: Install Docker from the upstream apt repository
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  block:
+    - name: Install apt prerequisites
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+        state: present
+        update_cache: true
+
+    - name: Create the apt keyring directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Download the Docker apt signing key
+      ansible.builtin.get_url:
+        url: "{{ docker_apt_key_url }}"
+        dest: /etc/apt/keyrings/docker.asc
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Configure the Docker apt source
+      ansible.builtin.template:
+        src: docker.sources.j2
+        dest: /etc/apt/sources.list.d/docker.sources
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install Docker Engine and Compose plugin
+      ansible.builtin.apt:
+        name: "{{ docker_packages }}"
+        state: present
+        update_cache: true
+      notify: Restart docker
+
+- name: Install Docker from the SLES container repository
+  when: ansible_facts['distribution'] == 'SLES'
+  block:
+    - name: Configure the Virtualization:containers repository
+      ansible.builtin.template:
+        src: virtualization-containers.repo.j2
+        dest: /etc/zypp/repos.d/virtualization-containers.repo
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Import the container repository key
+      ansible.builtin.rpm_key:
+        key: "{{ docker_suse_gpgkey }}"
+        state: present
+
+    - name: Install Docker with transactional-update
+      ansible.builtin.command:
+        argv: "{{ ['transactional-update', 'pkg', 'install', '--non-interactive'] + docker_packages }}"
+      when: docker_use_transactional_update | bool
+      changed_when: true
+
+    - name: Install Docker packages
+      community.general.zypper:
+        name: "{{ docker_packages }}"
+        state: present
+        update_cache: true
+      when: not docker_use_transactional_update | bool
+      notify: Restart docker
+
+- name: Detect systemd
+  ansible.builtin.stat:
+    path: /run/systemd/system
+  register: docker_systemd
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+  when:
+    - docker_manage_service | bool
+    - not docker_use_transactional_update | bool
+    - docker_systemd.stat.exists
+
+- name: Verify the Compose plugin
+  ansible.builtin.command:
+    argv: [docker, compose, version]
+  changed_when: false
+  when: docker_verify_cli | bool

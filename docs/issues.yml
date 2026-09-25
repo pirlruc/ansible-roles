@@ -1,0 +1,57 @@
+# Authored backlog for this repository.
+#
+# Schema: https://github.com/pirlruc/github-scaffold/blob/main/docs/issues-schema.md
+# Methodology: https://github.com/pirlruc/methodologies/tree/1.3.0/github-issue-adr
+
+milestones:
+  - name: Continuous improvement
+    epics:
+      - id: AR-ROLE-001
+        status: done
+        title: Independent Docker and account roles
+        overview:
+          problem: >-
+            Docker install, account creation, permission changes, and group
+            membership were not separated, so one role would have to call the others.
+          goal: >-
+            Four roles with empty dependencies and one orchestrator playbook,
+            tested on Ubuntu 26.04 and SLES 16.
+        decision: >-
+          In the context of host bootstrap that mixes packages and accounts, we
+          decided separate roles plus playbooks/orchestrate.yml, to achieve
+          independent reuse, accepting a second group_membership pass after Docker
+          creates the docker group.
+        architecture:
+          target: roles and orchestrator
+          modules:
+            - roles/docker
+            - roles/users
+            - roles/permissions
+            - roles/group_membership
+            - playbooks/orchestrate.yml
+        acceptance_criteria:
+          - Each role lists dependencies as an empty list
+          - Molecule covers ubuntu-26.04 and sles-16
+          - CI reads docs/guardrails/ansible/profile.thresholds.yml
+        guardrail_refs:
+          - ANSIBLE-API-001
+          - ANSIBLE-TEST-001
+          - ANSIBLE-TEST-002
+          - ANSIBLE-RUN-001
+        tasks:
+          - id: AR-ROLE-001-T1
+            status: done
+            title: Implement the four roles and the orchestrator
+            instructions:
+              files:
+                - roles/docker/tasks/main.yml
+                - roles/users/tasks/main.yml
+                - roles/permissions/tasks/main.yml
+                - roles/group_membership/tasks/main.yml
+                - playbooks/orchestrate.yml
+            verification:
+              - python3 scripts/check-ansible-guardrails.py
+              - ansible-lint
+            guardrail_refs:
+              - ANSIBLE-API-001
+              - ANSIBLE-LINT-001

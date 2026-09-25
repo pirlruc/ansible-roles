@@ -1,0 +1,11 @@
+---
+- name: Install Docker without creating users
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Docker Engine and Compose
+      ansible.builtin.import_role:
+        name: docker
+      vars:
+        docker_manage_service: false
+        docker_verify_cli: true

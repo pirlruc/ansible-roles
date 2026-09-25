@@ -1,0 +1,65 @@
+---
+argument_specs:
+  main:
+    short_description: Apply filesystem permissions and sudoers fragments.
+    options:
+      permissions_paths:
+        type: list
+        required: false
+        default: []
+        elements: dict
+        description: Paths to create or update. Owner must already exist when set.
+        options:
+          path:
+            type: str
+            required: true
+          state:
+            type: str
+            required: false
+            default: directory
+            choices:
+              - directory
+              - file
+              - absent
+          mode:
+            type: str
+            required: false
+          owner:
+            type: str
+            required: false
+          group:
+            type: str
+            required: false
+      permissions_sudoers:
+        type: list
+        required: false
+        default: []
+        elements: dict
+        description: Sudoers drop-ins under /etc/sudoers.d. The user is not created here.
+        options:
+          name:
+            type: str
+            required: true
+            description: Filename under /etc/sudoers.d.
+          user:
+            type: str
+            required: true
+          commands:
+            type: list
+            required: true
+            elements: str
+          runas:
+            type: str
+            required: false
+            default: ALL
+          nopasswd:
+            type: bool
+            required: false
+            default: false
+          state:
+            type: str
+            required: false
+            default: present
+            choices:
+              - present
+              - absent

@@ -1,0 +1,28 @@
+---
+argument_specs:
+  main:
+    short_description: Install Docker Engine and Compose.
+    options:
+      docker_manage_service:
+        type: bool
+        required: false
+        default: true
+        description: Start and enable the docker service when systemd is running.
+      docker_verify_cli:
+        type: bool
+        required: false
+        default: true
+        description: Run docker compose version after install.
+      docker_use_transactional_update:
+        type: bool
+        required: false
+        default: false
+        description: On transactional SLES, install with transactional-update instead of zypper.
+      docker_suse_baseurl:
+        type: str
+        required: false
+        description: OBS Virtualization:containers base URL for SLES 16.
+      docker_suse_gpgkey:
+        type: str
+        required: false
+        description: GPG key for the SLES container repository.

@@ -1,0 +1,15 @@
+---
+- name: Verify Docker CLI
+  hosts: all
+  tasks:
+    - name: Compose plugin answers
+      ansible.builtin.command:
+        argv: [docker, compose, version]
+      changed_when: false
+      register: compose_version
+
+    - name: Compose reported a version
+      ansible.builtin.assert:
+        that:
+          - compose_version.rc == 0
+          - compose_version.stdout | length > 0

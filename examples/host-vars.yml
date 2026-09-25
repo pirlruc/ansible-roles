@@ -1,0 +1,28 @@
+---
+# Example input for playbooks/orchestrate.yml. Copy and edit. Do not commit password hashes
+# that are real secrets.
+users_accounts:
+  - name: alice
+    comment: Alice
+    shell: /bin/bash
+permissions_paths:
+  - path: /var/lib/alice
+    state: directory
+    mode: "0750"
+    owner: alice
+    group: alice
+permissions_sudoers:
+  - name: alice-true
+    user: alice
+    commands:
+      - /usr/bin/true
+    nopasswd: true
+group_membership_entries:
+  - group: operators
+    members:
+      - alice
+orchestrator_install_docker: true
+orchestrator_docker_group_entries:
+  - group: docker
+    members:
+      - alice

@@ -1,0 +1,54 @@
+---
+argument_specs:
+  main:
+    short_description: Ensure local user accounts exist.
+    options:
+      users_accounts:
+        type: list
+        required: false
+        default: []
+        description: Accounts to create or remove. Supplementary groups are ignored; use group_membership.
+        elements: dict
+        options:
+          name:
+            type: str
+            required: true
+            description: Login name.
+          uid:
+            type: int
+            required: false
+            description: Numeric user id.
+          comment:
+            type: str
+            required: false
+            description: GECOS field.
+          shell:
+            type: str
+            required: false
+            description: Login shell.
+          home:
+            type: str
+            required: false
+            description: Home directory path.
+          create_home:
+            type: bool
+            required: false
+            default: true
+            description: Create the home directory when the account is present.
+          password:
+            type: str
+            required: false
+            description: Password hash only. Plaintext is rejected.
+          system:
+            type: bool
+            required: false
+            default: false
+            description: Create a system account.
+          state:
+            type: str
+            required: false
+            default: present
+            choices:
+              - present
+              - absent
+            description: Whether the account is present.

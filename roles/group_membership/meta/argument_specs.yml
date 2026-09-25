@@ -1,0 +1,26 @@
+---
+argument_specs:
+  main:
+    short_description: Associate existing users with an existing group.
+    options:
+      group_membership_entries:
+        type: list
+        required: false
+        default: []
+        elements: dict
+        description: Membership changes. The group and each user must already exist.
+        options:
+          group:
+            type: str
+            required: true
+          members:
+            type: list
+            required: true
+            elements: str
+          state:
+            type: str
+            required: false
+            default: present
+            choices:
+              - present
+              - absent

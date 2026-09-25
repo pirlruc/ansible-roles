@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+[virtualization_containers]
+name=virtualization_containers
+enabled=1
+autorefresh=1
+baseurl={{ docker_suse_baseurl }}
+type=rpm-md
+gpgcheck=1
+gpgkey={{ docker_suse_gpgkey }}

@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  role_name: group_membership
+  author: pirlruc
+  description: Add or remove users from groups that already exist.
+  license: MIT
+  min_ansible_version: "2.17"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+    - name: SLES
+      versions:
+        - all
+dependencies: []
