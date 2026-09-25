@@ -1,0 +1,28 @@
+---
+- name: Reject plaintext passwords
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - item.password is not defined or item.password is none or item.password is match('^\$')
+    fail_msg: >-
+      users_accounts[{{ index }}].password must be a hash (starts with $), not plaintext.
+  loop: "{{ users_accounts }}"
+  loop_control:
+    index_var: index
+    label: "{{ item.name }}"
+
+- name: Ensure user accounts
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid | default(omit) }}"
+    comment: "{{ item.comment | default(omit) }}"
+    shell: "{{ item.shell | default(omit) }}"
+    home: "{{ item.home | default(omit) }}"
+    create_home: "{{ item.create_home | default(true) }}"
+    password: "{{ item.password | default(omit) }}"
+    system: "{{ item.system | default(false) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ users_accounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: "{{ item.password is defined and item.password is not none }}"

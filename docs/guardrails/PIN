@@ -1,0 +1,8 @@
+# Ansible pack authored for pirlruc/guardrails (GR-PACK-006) and vendored here.
+# CI reads profile.thresholds.yml (CI-021).
+# Push to pirlruc/guardrails was rejected (HTTP 403) from this environment.
+# Base reviewed: 1a0dab01cf342dabfe7319ccefacb44a82cfb795 (guardrails main).
+source_repo: pirlruc/guardrails
+source_path: ansible/
+source_base: 1a0dab01cf342dabfe7319ccefacb44a82cfb795
+source_sha: unpushed

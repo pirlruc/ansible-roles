@@ -1,0 +1,33 @@
+---
+- name: Orchestrate accounts, permissions, groups, and Docker
+  hosts: all
+  become: true
+  tasks:
+    - name: Create accounts
+      ansible.builtin.import_role:
+        name: users
+      when: users_accounts | default([]) | length > 0
+
+    - name: Apply filesystem permissions and sudoers
+      ansible.builtin.import_role:
+        name: permissions
+      when: >-
+        (permissions_paths | default([]) | length > 0)
+        or (permissions_sudoers | default([]) | length > 0)
+
+    - name: Associate users with groups that already exist
+      ansible.builtin.import_role:
+        name: group_membership
+      when: group_membership_entries | default([]) | length > 0
+
+    - name: Install Docker Engine and Compose
+      ansible.builtin.import_role:
+        name: docker
+      when: orchestrator_install_docker | default(false) | bool
+
+    - name: Associate users with the docker group after install
+      ansible.builtin.import_role:
+        name: group_membership
+      vars:
+        group_membership_entries: "{{ orchestrator_docker_group_entries | default([]) }}"
+      when: orchestrator_docker_group_entries | default([]) | length > 0

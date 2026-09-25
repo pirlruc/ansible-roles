@@ -1,0 +1,33 @@
+---
+- name: Apply filesystem permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: "{{ item.state | default('directory') }}"
+    mode: "{{ item.mode | default(omit) }}"
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+  loop: "{{ permissions_paths }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Remove sudoers drop-ins
+  ansible.builtin.file:
+    path: "/etc/sudoers.d/{{ item.name }}"
+    state: absent
+  loop: "{{ permissions_sudoers }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.state | default('present') == 'absent'
+
+- name: Install sudoers drop-ins
+  ansible.builtin.template:
+    src: sudoers.j2
+    dest: "/etc/sudoers.d/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: /usr/sbin/visudo -cf %s
+  loop: "{{ permissions_sudoers }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.state | default('present') == 'present'

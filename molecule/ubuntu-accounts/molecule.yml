@@ -1,0 +1,31 @@
+---
+dependency:
+  name: galaxy
+  options:
+    requirements-file: ${MOLECULE_PROJECT_DIRECTORY}/requirements.yml
+driver:
+  name: docker
+platforms:
+  - name: ubuntu-26.04
+    image: ubuntu-26.04-ansible-accounts
+    pre_build_image: false
+    dockerfile: Dockerfile
+    privileged: true
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/roles
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+scenario:
+  test_sequence:
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
+verifier:
+  name: ansible

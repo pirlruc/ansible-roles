@@ -1,0 +1,37 @@
+---
+- name: Verify account roles
+  hosts: all
+  become: true
+  tasks:
+    - name: Account exists
+      ansible.builtin.command: id roleuser
+      changed_when: false
+      register: roleuser_id
+
+    - name: Account is in the prepared group
+      ansible.builtin.assert:
+        that:
+          - "'roleusers' in roleuser_id.stdout"
+
+    - name: Data directory mode
+      ansible.builtin.stat:
+        path: /var/tmp/roleuser-data
+      register: roleuser_data
+
+    - name: Directory is owned by the account
+      ansible.builtin.assert:
+        that:
+          - roleuser_data.stat.exists
+          - roleuser_data.stat.pw_name == 'roleuser'
+          - roleuser_data.stat.mode == '0750'
+
+    - name: Sudoers drop-in exists
+      ansible.builtin.stat:
+        path: /etc/sudoers.d/roleuser-true
+      register: roleuser_sudo
+
+    - name: Sudoers file is present
+      ansible.builtin.assert:
+        that:
+          - roleuser_sudo.stat.exists
+          - roleuser_sudo.stat.mode == '0440'
