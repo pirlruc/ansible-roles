@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
-# Idempotent Cloud Agent bootstrap for the ansible-roles repository.
-# Provisions a self-contained Ansible role development toolchain
-# (ansible-core, ansible-lint, yamllint, molecule) in a dedicated
-# virtualenv and exposes it on PATH via /usr/local/bin.
+# Cloud Agent toolchain on Cursor's default image.
+#
+# Molecule against Ubuntu 26.04 and SLES 16 runs in .devcontainer/ (Docker-in-Docker)
+# and in GitHub Actions. This script does not install a Docker daemon.
+# When requirements.txt and requirements.yml exist, they are the version source.
+# The pinned fallback below is only for a checkout that does not have them yet.
 set -euo pipefail
 
 VENV="${ANSIBLE_VENV:-$HOME/.venv/ansible}"
 
-# ansible-core / ansible-lint / yamllint / molecule are pinned for
-# reproducible snapshots. Bump deliberately, not incidentally.
-ANSIBLE_CORE_VERSION="2.21.4"
-ANSIBLE_LINT_VERSION="26.9.0"
-YAMLLINT_VERSION="1.38.0"
-MOLECULE_VERSION="26.9.0"
-
-# The default base image ships Python 3.12 but not the venv module.
 if ! python3 -c 'import ensurepip' >/dev/null 2>&1; then
   sudo apt-get update -qq
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3.12-venv
@@ -25,22 +19,21 @@ if [ ! -x "$VENV/bin/python" ]; then
 fi
 
 "$VENV/bin/pip" install --quiet --upgrade pip wheel
-"$VENV/bin/pip" install --quiet \
-  "ansible-core==${ANSIBLE_CORE_VERSION}" \
-  "ansible-lint==${ANSIBLE_LINT_VERSION}" \
-  "yamllint==${YAMLLINT_VERSION}" \
-  "molecule==${MOLECULE_VERSION}"
 
-# Optional project-managed dependencies (present once roles are added).
 if [ -f requirements.txt ]; then
   "$VENV/bin/pip" install --quiet -r requirements.txt
-fi
-if [ -f requirements.yml ]; then
-  "$VENV/bin/ansible-galaxy" install -r requirements.yml
+else
+  "$VENV/bin/pip" install --quiet \
+    "ansible-core==2.21.4" \
+    "ansible-lint==26.9.0" \
+    "yamllint==1.38.0" \
+    "molecule==26.9.0"
 fi
 
-# Expose the toolchain on PATH deterministically, independent of
-# login-shell profile timing.
+if [ -f requirements.yml ]; then
+  "$VENV/bin/ansible-galaxy" collection install -r requirements.yml
+fi
+
 for tool in "$VENV"/bin/ansible "$VENV"/bin/ansible-* \
   "$VENV"/bin/ansible-lint "$VENV"/bin/yamllint "$VENV"/bin/molecule; do
   [ -e "$tool" ] && sudo ln -sf "$tool" /usr/local/bin/
