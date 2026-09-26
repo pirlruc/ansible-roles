@@ -164,8 +164,10 @@ milestones:
           Do not edit issues #1 through #25. Those issues stay as they are.
           This epic is the later decision for where the workflow body lives.
         out_of_scope:
-          - Editing issues #1 through #25
-          - Replacing the inline ansible-lint and Molecule jobs before common-ansible-verify is on commondevops main
+          - "Editing issues #1 through #25"
+          - >-
+            Replacing the inline ansible-lint and Molecule jobs before
+            common-ansible-verify is on commondevops main
           - Sending Dockerfiles under molecule/ to container-devcontainer
           - Folding ansible-lint YAML rules into common-doc-verify
         architecture:
@@ -175,7 +177,9 @@ milestones:
         acceptance_criteria:
           - ci.yml calls common-doc-verify, common-infra-lint, and common-secrets-sast
           - ci.yml calls containerdevops container-devcontainer for .devcontainer/Dockerfile only
-          - After common-ansible-verify exists, ci.yml calls it for ubuntu-accounts, sles-accounts, ubuntu-docker, and sles-docker
+          - >-
+            After common-ansible-verify exists, ci.yml calls it for
+            ubuntu-accounts, sles-accounts, ubuntu-docker, and sles-docker
           - Every scripts_ref equals the uses pin on that job
           - The inline jobs remain on main until that reusable workflow exists
         guardrail_refs:
@@ -192,7 +196,9 @@ milestones:
               files:
                 - .github/workflows/ci.yml
             verification:
-              - rg -n 'common-doc-verify|common-infra-lint|common-secrets-sast|container-devcontainer' .github/workflows/ci.yml
+              - >-
+                rg -n 'common-doc-verify|common-infra-lint|common-secrets-sast|container-devcontainer'
+                .github/workflows/ci.yml
               - rg -n 'molecule test' .github/workflows/ci.yml
             guardrail_refs:
               - CI-034
