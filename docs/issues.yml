@@ -62,17 +62,16 @@ milestones:
         overview:
           problem: >-
             gpu-server writes the same NVIDIA runtime object over
-            /etc/docker/daemon.json from both the Ubuntu 26.04 and SLES 15
-            docker_engine roles, which drops logging and any other runtimes.
-            home-assistant does not write that file. Role docker installs the
-            engine and must not also own daemon configuration.
+            /etc/docker/daemon.json from both playbooks, which drops logging
+            and any other runtimes. home-assistant does not write that file.
+            Role docker installs the engine and must not also own daemon
+            configuration. Supported hosts are Ubuntu 26.04 and SLES 16.
           goal: >-
             Role docker_daemon deep-merges a caller-supplied object into
             /etc/docker/daemon.json, restarts Docker when the file changes,
             lists no role dependencies, and has Molecule coverage on Ubuntu
-            26.04 and SLES 16 with two converges. It does not assert a
-            distribution version, so the SLES 15 playbook can call it for the
-            file write alone.
+            26.04 and SLES 16 with two converges. It accepts those two
+            platforms only, the same gate as role docker.
         decision: >-
           In the context of NVIDIA daemon config duplicated beside the engine
           install, facing a role that must do one thing, we decided a separate
@@ -81,7 +80,7 @@ milestones:
           is not deleted from an existing file.
         out_of_scope:
           - Home Assistant adoption until that stack writes daemon.json
-          - SLES 15 package install (role docker still refuses SLES 15)
+          - SLES 15. gpu-server moves that playbook to SLES 16 in GPU-SLES-001
           - NVIDIA driver and container toolkit tasks
           - Deleting daemon.json keys that the caller no longer sends
         architecture:
@@ -95,7 +94,7 @@ milestones:
           - An existing daemon.json key that the fragment does not mention survives a converge
           - A fragment key overlays the same key already in the file
           - Molecule runs idempotence on ubuntu-26.04 and sles-16
-          - The role does not install packages and does not fail on distribution version
+          - The role does not install packages and refuses distributions other than Ubuntu 26.04 and SLES 16
         guardrail_refs:
           - ANSIBLE-API-001
           - ANSIBLE-API-002

@@ -23,7 +23,9 @@ Ansible thresholds live at `docs/guardrails/ansible/` (`ANSIBLE-*`, epic GR-PACK
 
 ## Local test
 
-The devcontainer is Ubuntu 26.04 with Ansible, ansible-lint, and Molecule. Docker-in-Docker is enabled so Molecule can start Ubuntu 26.04 and SLES 16 containers.
+Two environments stay side by side. `.cursor/install.sh` installs the Ansible toolchain from `requirements.txt` and `requirements.yml` on the Cursor Cloud Agent image. It does not install a Docker daemon. `.devcontainer/` is Ubuntu 26.04 with Docker-in-Docker so local Molecule can start Ubuntu 26.04 and SLES 16 containers. GitHub Actions and the devcontainer run Molecule. Cloud Agents do not boot `.devcontainer`.
+
+Supported platforms are Ubuntu 26.04 and SLES 16.
 
 ```sh
 pip install -r requirements.txt
