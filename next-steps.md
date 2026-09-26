@@ -35,7 +35,30 @@ applied to `pirlruc/ansible-roles` or to all repositories. Give it Issues: write
 Secrets are injected when an agent starts. An agent that is already running will not see a secret
 added later. Start a new agent, confirm `CURSOR_UPDATE_ISSUE_TOKEN` is set, and do not print it.
 
-## Issues to open
+## Issues opened
+
+Filed on 2026-09-26. Do not open a second copy. Tasks are sub-issues of their epic.
+
+| Repo | Epic | What it decides |
+|------|------|-----------------|
+| `pirlruc/home-assistant` | [#2 HA-ANS-001](https://github.com/pirlruc/home-assistant/issues/2) | Replace `ansible/roles/docker` with `docker` and `group_membership` |
+| `pirlruc/home-assistant` | [#5 HA-ANS-002](https://github.com/pirlruc/home-assistant/issues/5) | Argument specs, empty dependencies, and idempotence for the roles that stay |
+| `pirlruc/gpu-server` | [#1 GPU-ANS-001](https://github.com/pirlruc/gpu-server/issues/1) | Ubuntu 26.04 engine install only |
+| `pirlruc/gpu-server` | [#3 GPU-ANS-002](https://github.com/pirlruc/gpu-server/issues/3) | Both playbooks call `docker_daemon` after `AR-ROLE-002` |
+| `pirlruc/gpu-server` | [#5 GPU-ANS-003](https://github.com/pirlruc/gpu-server/issues/5) | One validation role inside this repo |
+| `pirlruc/gpu-server` | [#7 GPU-ANS-004](https://github.com/pirlruc/gpu-server/issues/7) | Argument specs and READMEs for roles that stay |
+| `pirlruc/gpu-server` | [#9 GPU-CI-001](https://github.com/pirlruc/gpu-server/issues/9) | Reusable-workflow CI and Ubuntu Molecule |
+| `pirlruc/gpu-server` | [#12 GPU-GRP-001](https://github.com/pirlruc/gpu-server/issues/12) | Future non-root Docker access uses `group_membership` |
+| `pirlruc/guardrails` | [#172 GR-PACK-006](https://github.com/pirlruc/guardrails/issues/172) | Land the vendored `ansible/` pack |
+| `pirlruc/commondevops` | [#152 CMN-WF-005](https://github.com/pirlruc/commondevops/issues/152) | Add `common-ansible-verify` |
+| `pirlruc/ansible-roles` | [#32 AR-ROLE-002](https://github.com/pirlruc/ansible-roles/issues/32) | `docker_daemon` merge role |
+| `pirlruc/ansible-roles` | [#35 AR-CI-001](https://github.com/pirlruc/ansible-roles/issues/35) | Call reusable workflows; keep inline Molecule until `CMN-WF-005` is on `main` |
+
+`AR-ROLE-001` is [#30](https://github.com/pirlruc/ansible-roles/issues/30), closed, because that work is already on `main`. Issues #1–#25 were not edited.
+
+## Source text already filed
+
+The sections below are the decisions copied into the epics above. They are not a second backlog.
 
 ### `pirlruc/home-assistant`
 
@@ -137,6 +160,6 @@ Molecule Dockerfiles under `molecule/` are test images, not that devcontainer wo
 
 ## After the issues exist
 
-Return to `pirlruc/ansible-roles` and point `.github/workflows/ci.yml` at
-`common-ansible-verify` once that workflow is on `commondevops` `main`. Until then the
-inline workflow stays.
+Do not point `.github/workflows/ci.yml` at `common-ansible-verify` until that workflow
+is on `commondevops` `main`. That wait is [AR-CI-001](https://github.com/pirlruc/ansible-roles/issues/35).
+Until then the inline workflow stays.
