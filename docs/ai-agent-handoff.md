@@ -20,6 +20,6 @@
 
 ## Follow-ups
 
-- Land `docs/guardrails/ansible/` on `pirlruc/guardrails` as GR-PACK-006. This environment received HTTP 403 on write, so the pack is vendored here against guardrails main `1a0dab01cf342dabfe7319ccefacb44a82cfb795`.
+- Land `docs/guardrails/ansible/` on `pirlruc/guardrails` as [GR-PACK-006](https://github.com/pirlruc/guardrails/issues/172). The pack is vendored here against guardrails main `1a0dab01cf342dabfe7319ccefacb44a82cfb795` because a contents write returned HTTP 403. The issue is open; do not push the pack from this repo.
 - Full `docs/guardrails` submodule is not used: guardrails is private and this repo is public. Only the Ansible pack is vendored (CI-021).
-- SLES Docker uses the openSUSE Virtualization:containers 16.0 repository because SLES 16 defaults to Podman.
+- SLES Docker uses the openSUSE Virtualization:containers 16.0 repository because SLES 16 defaults to Podman. SLES 15 is not a supported platform. gpu-server tracks the playbook move in [GPU-SLES-001](https://github.com/pirlruc/gpu-server/issues/13).
