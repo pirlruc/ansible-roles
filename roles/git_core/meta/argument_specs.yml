@@ -1,0 +1,12 @@
+---
+argument_specs:
+  main:
+    short_description: Install the git-core package.
+    options:
+      git_core_package:
+        type: str
+        required: false
+        default: git-core
+        description: >-
+          Package to install. Ubuntu 26.04 publishes git-core as a virtual
+          package provided by git. SLES 16 publishes a real git-core package.

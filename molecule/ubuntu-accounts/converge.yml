@@ -42,3 +42,7 @@
           - group: roleusers
             members:
               - roleuser
+
+    - name: Install git-core
+      ansible.builtin.import_role:
+        name: git_core

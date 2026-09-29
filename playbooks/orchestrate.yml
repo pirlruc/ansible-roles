@@ -1,5 +1,5 @@
 ---
-- name: Orchestrate accounts, permissions, groups, and Docker
+- name: Orchestrate accounts, permissions, groups, Docker, and git
   hosts: all
   become: true
   tasks:
@@ -31,3 +31,8 @@
       vars:
         group_membership_entries: "{{ orchestrator_docker_group_entries | default([]) }}"
       when: orchestrator_docker_group_entries | default([]) | length > 0
+
+    - name: Install git-core
+      ansible.builtin.import_role:
+        name: git_core
+      when: orchestrator_install_git | default(false) | bool

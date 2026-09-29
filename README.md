@@ -12,8 +12,9 @@ Platforms: Ubuntu 26.04 and SLES 16.
 | `permissions` | Set path mode/owner and `/etc/sudoers.d` drop-ins | Create accounts |
 | `group_membership` | Add or remove users on an existing group | Create the group or the user |
 | `docker` | Install Docker Engine and Compose v2 | Create users or add them to the `docker` group |
+| `git_core` | Install the `git-core` package | Configure remotes, credentials, or identity |
 
-`playbooks/orchestrate.yml` runs account, permissions, and group membership, then Docker, then a second `group_membership` pass so users can join the `docker` group the package creates.
+`playbooks/orchestrate.yml` runs account, permissions, and group membership, then Docker, then a second `group_membership` pass so users can join the `docker` group the package creates. It installs `git-core` when `orchestrator_install_git` is true. On Ubuntu 26.04 that name is a virtual package provided by `git`. On SLES 16 it is the real package.
 
 ## Guardrails
 

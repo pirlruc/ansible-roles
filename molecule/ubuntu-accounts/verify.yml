@@ -35,3 +35,18 @@
         that:
           - roleuser_sudo.stat.exists
           - roleuser_sudo.stat.mode == '0440'
+
+    - name: Git binary is installed
+      ansible.builtin.stat:
+        path: /usr/bin/git
+      register: git_core_bin
+
+    - name: Git binary is executable
+      ansible.builtin.assert:
+        that:
+          - git_core_bin.stat.exists
+          - git_core_bin.stat.executable
+
+    - name: Ubuntu installed the git provider of git-core
+      ansible.builtin.command: dpkg-query -W git
+      changed_when: false
