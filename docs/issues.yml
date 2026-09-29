@@ -215,3 +215,150 @@ milestones:
               - CI-034
               - ANSIBLE-LINT-001
               - ANSIBLE-TEST-001
+
+      - id: AR-PIN-001
+        status: done
+        title: Pin guardrails 1.8.0 and github-scaffold 1.7.0
+        overview:
+          problem: >-
+            docs/guardrails was a partial Ansible pack copied from an unpushed
+            tree. ansible_core_min was still 2.17, which guardrails 1.8.0
+            retired. Issue and PR templates were not the scaffold release.
+          goal: >-
+            Submodule pins match the latest release of each repository, CI
+            reads the Ansible thresholds from that pin, and scaffold 1.7.0
+            files are the ones on the default branch.
+        decision: >-
+          In the context of a public role repository that consumes private
+          packs, facing a vendored subset that had drifted, we decided git
+          submodules at docs/guardrails (guardrails 1.8.0) and .github/scaffold
+          (github-scaffold 1.7.0), to achieve the same pin strategy as
+          commondevops, accepting that GitHub Actions needs
+          GUARDRAILS_READ_TOKEN to populate the guardrails gitlink.
+        architecture:
+          target: submodule pins
+          modules:
+            - docs/guardrails
+            - .github/scaffold
+            - scripts/check-submodule-pins.sh
+            - scripts/check-ansible-guardrails.py
+        acceptance_criteria:
+          - docs/guardrails gitlink is aa5184ceaa5d005a71d984fd771564cb10b63681
+          - .github/scaffold gitlink is e76bb3fda306c490b4b3ea5e1a4e3977e04a1a1d
+          - Each role min_ansible_version is 2.20
+          - docs/guardrail-deviations.yml has an empty deviations list
+        guardrail_refs:
+          - ANSIBLE-LANG-002
+          - ANSIBLE-LINT-001
+          - ANSIBLE-LINT-003
+          - SC-DEP-004
+          - CI-022
+        tasks:
+          - id: AR-PIN-001-T1
+            status: done
+            title: Replace the vendored pack with the release submodules
+            instructions:
+              files:
+                - .gitmodules
+                - docs/guardrails
+                - .github/scaffold
+                - scripts/check-submodule-pins.sh
+            verification:
+              - sh scripts/check-submodule-pins.sh
+            guardrail_refs:
+              - SC-DEP-004
+          - id: AR-PIN-001-T2
+            status: done
+            title: Meet the 1.8.0 Ansible thresholds without a new deviation
+            instructions:
+              files:
+                - roles/docker/meta/main.yml
+                - roles/users/meta/main.yml
+                - roles/permissions/meta/main.yml
+                - roles/group_membership/meta/main.yml
+                - .ansible-lint
+                - scripts/check-ansible-guardrails.py
+            verification:
+              - python3 scripts/check-ansible-guardrails.py
+              - ansible-lint
+            guardrail_refs:
+              - ANSIBLE-LANG-002
+              - ANSIBLE-LINT-003
+
+      - id: AR-CI-002
+        status: open
+        title: Keep inline gates until a public caller can use private reusables
+        overview:
+          problem: >-
+            commondevops 5.1.2 and containerdevops 5.0.4 are private.
+            ansible-roles is public. A public workflow cannot resolve a
+            private workflow_call, so uses: entries for common-doc-verify,
+            common-infra-lint, common-secrets-sast, common-scaffold-verify,
+            and container-devcontainer would fail before secrets are read.
+            common-ansible-verify does not exist.
+          goal: >-
+            Token-free CI still runs ansible-lint, yamllint, shellcheck,
+            actionlint, markdown links, and Molecule. The thresholds job
+            fetches guardrails when GUARDRAILS_READ_TOKEN is set. Reusable
+            calls replace those inline steps only after a public caller path
+            exists.
+        decision: >-
+          In the context of CI for this public repository, facing private
+          reusable workflows on a personal account, we decided to keep the
+          job bodies inline and pin the same tool versions commondevops
+          5.1.2 installs, to achieve the gates without a workflow file that
+          GitHub cannot load, accepting duplicate steps until commondevops
+          can be called from a public repository.
+        description: >-
+          This epic does not edit AR-CI-001. That epic stays the record of
+          the earlier call-site plan. This epic is the later decision for a
+          public caller.
+        out_of_scope:
+          - Publishing this repository's own workflow_call
+          - Sending molecule Dockerfiles through container-build or container-publish
+        architecture:
+          target: .github/workflows/ci.yml
+          modules:
+            - .github/workflows/ci.yml
+            - scripts/install-lint-tools.sh
+            - scripts/ci-init-guardrails.sh
+        acceptance_criteria:
+          - ci.yml does not uses: a private repository
+          - Dependabot pull requests still run the lint job
+          - shellcheck, actionlint, and hadolint versions match commondevops 5.1.2
+        guardrail_refs:
+          - CI-019
+          - CI-024
+          - CI-008
+          - SHELL-LINT-001
+          - DOCKER-LINT-001
+        tasks:
+          - id: AR-CI-002-T1
+            status: done
+            title: Run the token-free lint gates in ci.yml
+            instructions:
+              files:
+                - .github/workflows/ci.yml
+                - scripts/install-lint-tools.sh
+            verification:
+              - sh scripts/install-lint-tools.sh
+              - shellcheck .cursor/install.sh scripts/*.sh
+              - actionlint
+            guardrail_refs:
+              - CI-024
+              - SHELL-LINT-001
+          - id: AR-CI-002-T2
+            status: open
+            title: Replace inline gates with workflow_call when a public path exists
+            instructions:
+              files:
+                - .github/workflows/ci.yml
+            verification:
+              - >-
+                A public pull request on this repository completes
+                common-infra-lint, common-doc-verify, common-secrets-sast,
+                and container-devcontainer
+              - Each scripts_ref equals that job's uses pin
+            guardrail_refs:
+              - CI-019
+              - CI-034

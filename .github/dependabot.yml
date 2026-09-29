@@ -1,12 +1,44 @@
+# SC-DEP-001/002/003. Cadence: docs/guardrails/supply-chain/profile.thresholds.yml
+# (monthly, open-PR limit 5, no blocked semver level).
+# Personal-account private git: Dependabot secret DEPENDABOT_GITHUB_TOKEN
+# (Contents: Read on pirlruc/guardrails and pirlruc/github-scaffold).
+# Actions secrets are not visible to Dependabot (SC-DEP-005).
+
 version: 2
+
+registries:
+  github-private:
+    type: git
+    url: https://github.com
+    username: x-access-token
+    password: ${{secrets.DEPENDABOT_GITHUB_TOKEN}}
+
+multi-ecosystem-groups:
+  all-dependencies:
+    schedule:
+      interval: monthly
+      time: "06:00"
+      timezone: Europe/Lisbon
+    commit-message:
+      prefix: build
+      include: scope
+
 updates:
   - package-ecosystem: github-actions
     directory: /
-    schedule:
-      interval: monthly
-    open-pull-requests-limit: 5
+    patterns: ["*"]
+    multi-ecosystem-group: all-dependencies
   - package-ecosystem: pip
     directory: /
-    schedule:
-      interval: monthly
-    open-pull-requests-limit: 5
+    patterns: ["*"]
+    multi-ecosystem-group: all-dependencies
+  - package-ecosystem: gitsubmodule
+    directory: /
+    patterns: ["*"]
+    multi-ecosystem-group: all-dependencies
+    registries:
+      - github-private
+  - package-ecosystem: docker
+    directory: /
+    patterns: ["*"]
+    multi-ecosystem-group: all-dependencies
