@@ -17,9 +17,13 @@ Platforms: Ubuntu 26.04 and SLES 16.
 
 ## Guardrails
 
-Ansible thresholds live at `docs/guardrails/ansible/` (`ANSIBLE-*`, epic GR-PACK-006). CI reads `profile.thresholds.yml` and fails closed when a key is missing. `docs/guardrail-deviations.yml` is empty. The same pack was prepared for [pirlruc/guardrails](https://github.com/pirlruc/guardrails); this environment could not push there.
+[pirlruc/guardrails](https://github.com/pirlruc/guardrails) tag **1.8.0** (`aa5184ceaa5d005a71d984fd771564cb10b63681`) is the `docs/guardrails` submodule. [pirlruc/github-scaffold](https://github.com/pirlruc/github-scaffold) tag **1.7.0** (`e76bb3fda306c490b4b3ea5e1a4e3977e04a1a1d`) is the `.github/scaffold` submodule. CI reads `docs/guardrails/ansible/profile.thresholds.yml` and fails closed when a key is missing. `docs/guardrail-deviations.yml` is empty.
 
-`pirlruc/home-assistant` and `pirlruc/gpu-server` are not visible with the credentials available to this repository, so those trees were not used as role examples.
+```sh
+git submodule update --init --recursive
+```
+
+A public checkout cannot fetch those private submodules without a token that has contents read on both repositories. GitHub Actions uses the `GUARDRAILS_READ_TOKEN` secret for `docs/guardrails`.
 
 ## Local test
 
@@ -30,7 +34,13 @@ Supported platforms are Ubuntu 26.04 and SLES 16.
 ```sh
 pip install -r requirements.txt
 ansible-galaxy collection install -r requirements.yml
+sh scripts/check-submodule-pins.sh
+sh scripts/install-lint-tools.sh
+shellcheck .cursor/install.sh scripts/*.sh
+actionlint
+python3 scripts/lint-doc-links.py
 python3 scripts/check-ansible-guardrails.py
+sh scripts/check-lint-thresholds.sh
 yamllint .
 ansible-lint
 ansible-playbook --syntax-check playbooks/orchestrate.yml

@@ -39,7 +39,34 @@ def main() -> int:
     if f"profile: {profile}" not in lint:
         print(f".ansible-lint must set profile: {profile}", file=sys.stderr)
         return 1
+    if data.get("ansible_lint_strict") is not True:
+        print("ansible_lint_strict must be true", file=sys.stderr)
+        return 1
+    if "strict: true" not in lint:
+        print(".ansible-lint must set strict: true", file=sys.stderr)
+        return 1
+    lint_data = yaml.safe_load(lint) or {}
+    for excluded in lint_data.get("exclude_paths") or []:
+        normalized = str(excluded).strip().strip("/")
+        if normalized in {"roles", "playbooks"} or normalized.startswith(("roles/", "playbooks/")):
+            print(f".ansible-lint must not exclude playbooks or roles ({excluded})", file=sys.stderr)
+            return 1
 
+    collections = yaml.safe_load((ROOT / "requirements.yml").read_text()).get("collections") or []
+    if not collections:
+        print("requirements.yml must pin collection name and version (ANSIBLE-LANG-003)", file=sys.stderr)
+        return 1
+    for item in collections:
+        if not item.get("name") or not item.get("version"):
+            print(f"unpinned collection entry: {item}", file=sys.stderr)
+            return 1
+
+    cfg = (ROOT / "ansible.cfg").read_text()
+    if re.search(r"(?m)^\s*become\s*=\s*true\s*$", cfg):
+        print("ansible.cfg must not set become = true (ANSIBLE-SEC-003)", file=sys.stderr)
+        return 1
+
+    floor = version_tuple(str(data["ansible_core_min"]))
     for role in ROLES:
         base = ROOT / "roles" / role
         for relative in ("README.md", "meta/main.yml", "meta/argument_specs.yml", "tasks/main.yml"):
@@ -49,6 +76,14 @@ def main() -> int:
         meta = (base / "meta" / "main.yml").read_text()
         if "dependencies: []" not in meta:
             print(f"{role} must keep dependencies: [] (compose roles from the orchestrator)", file=sys.stderr)
+            return 1
+        meta_data = yaml.safe_load(meta) or {}
+        minimum = str((meta_data.get("galaxy_info") or {}).get("min_ansible_version") or "")
+        if not minimum or version_tuple(minimum) < floor:
+            print(
+                f"{role} min_ansible_version {minimum or 'missing'} is below ansible_core_min {data['ansible_core_min']}",
+                file=sys.stderr,
+            )
             return 1
 
     version = ansible_core_version()

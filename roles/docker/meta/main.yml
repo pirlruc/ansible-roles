@@ -4,7 +4,7 @@ galaxy_info:
   author: pirlruc
   description: Install Docker Engine and the Compose v2 plugin. Does not create users or group memberships.
   license: MIT
-  min_ansible_version: "2.17"
+  min_ansible_version: "2.20"
   platforms:
     - name: Ubuntu
       versions:
