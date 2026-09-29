@@ -1,4 +1,9 @@
 ---
+# Upstream pins. Their YAML is owned by those repositories.
+ignore: |
+  .github/scaffold/
+  docs/guardrails/
+
 extends: default
 rules:
   comments:

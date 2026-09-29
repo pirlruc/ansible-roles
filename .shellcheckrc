@@ -1,0 +1,4 @@
+# SHELL-LINT-001. Org default shellcheck_failure_threshold is error
+# (docs/guardrails/shell/profile.thresholds.yml).
+severity=error
+external-sources=true

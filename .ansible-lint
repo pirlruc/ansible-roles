@@ -1,8 +1,8 @@
 ---
 profile: production
+# ANSIBLE-LINT-003 allows path excludes for trees that are not playbooks or roles.
+# Playbooks and roles stay in scope. Molecule converge and verify playbooks stay in scope.
 exclude_paths:
   - .github/
   - docs/
-  - .devcontainer/
-  - molecule/
 strict: true

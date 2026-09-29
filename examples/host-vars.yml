@@ -22,6 +22,7 @@ group_membership_entries:
     members:
       - alice
 orchestrator_install_docker: true
+orchestrator_install_git: true
 orchestrator_docker_group_entries:
   - group: docker
     members:

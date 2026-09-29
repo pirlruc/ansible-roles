@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  role_name: git_core
+  author: pirlruc
+  description: Install the git-core package on Ubuntu 26.04 and SLES 16.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+    - name: SLES
+      versions:
+        - all
+dependencies: []

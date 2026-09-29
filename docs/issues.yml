@@ -56,6 +56,54 @@ milestones:
               - ANSIBLE-API-001
               - ANSIBLE-LINT-001
 
+      - id: AR-ROLE-003
+        status: done
+        title: Install git-core on Ubuntu and SLES
+        overview:
+          problem: >-
+            Host bootstrap needs git, and Ubuntu publishes git-core as a
+            virtual package while SLES publishes a real package. No role
+            owned that install.
+          goal: >-
+            Role git_core installs git-core, lists no dependencies, and has
+            Molecule coverage on Ubuntu 26.04 and SLES 16.
+        decision: >-
+          In the context of a package that Ubuntu publishes as a virtual name
+          and SLES publishes as a real package, we decided one role that
+          installs git-core on both, to achieve a single call site, accepting
+          that Ubuntu's apt selects the git provider.
+        architecture:
+          target: roles/git_core
+          modules:
+            - roles/git_core
+            - playbooks/orchestrate.yml
+            - molecule/ubuntu-accounts
+            - molecule/sles-accounts
+        acceptance_criteria:
+          - dependencies is an empty list
+          - The role accepts Ubuntu 26.04 and SLES 16 only
+          - Molecule converges the role on both platforms
+        guardrail_refs:
+          - ANSIBLE-API-001
+          - ANSIBLE-TEST-001
+          - ANSIBLE-TEST-002
+          - ANSIBLE-DOC-001
+        tasks:
+          - id: AR-ROLE-003-T1
+            status: done
+            title: Implement git_core and cover it from the account scenarios
+            instructions:
+              files:
+                - roles/git_core/tasks/main.yml
+                - molecule/ubuntu-accounts/converge.yml
+                - molecule/sles-accounts/converge.yml
+            verification:
+              - python3 scripts/check-ansible-guardrails.py
+              - ansible-lint roles/git_core
+            guardrail_refs:
+              - ANSIBLE-API-001
+              - ANSIBLE-TEST-001
+
       - id: AR-ROLE-002
         status: open
         title: Add a docker_daemon role that merges daemon.json
@@ -215,3 +263,146 @@ milestones:
               - CI-034
               - ANSIBLE-LINT-001
               - ANSIBLE-TEST-001
+
+      - id: AR-PIN-001
+        status: done
+        title: Pin guardrails 1.8.0 and github-scaffold 1.7.0
+        overview:
+          problem: >-
+            docs/guardrails was a partial Ansible pack copied from an unpushed
+            tree. ansible_core_min was still 2.17, which guardrails 1.8.0
+            retired. Issue and PR templates were not the scaffold release.
+          goal: >-
+            Submodule pins match the latest release of each repository, CI
+            reads the Ansible thresholds from that pin, and scaffold 1.7.0
+            files are the ones on the default branch.
+        decision: >-
+          In the context of a public role repository that consumes private
+          packs, facing a vendored subset that had drifted, we decided git
+          submodules at docs/guardrails (guardrails 1.8.0) and .github/scaffold
+          (github-scaffold 1.7.0), to achieve the same pin strategy as
+          commondevops, accepting that GitHub Actions needs
+          GUARDRAILS_READ_TOKEN to populate the guardrails gitlink.
+        architecture:
+          target: submodule pins
+          modules:
+            - docs/guardrails
+            - .github/scaffold
+            - scripts/check-submodule-pins.sh
+            - scripts/check-ansible-guardrails.py
+        acceptance_criteria:
+          - docs/guardrails gitlink is aa5184ceaa5d005a71d984fd771564cb10b63681
+          - .github/scaffold gitlink is e76bb3fda306c490b4b3ea5e1a4e3977e04a1a1d
+          - Each role min_ansible_version is 2.20
+          - docs/guardrail-deviations.yml has an empty deviations list
+        guardrail_refs:
+          - ANSIBLE-LANG-002
+          - ANSIBLE-LINT-001
+          - ANSIBLE-LINT-003
+          - SC-DEP-004
+          - CI-022
+        tasks:
+          - id: AR-PIN-001-T1
+            status: done
+            title: Replace the vendored pack with the release submodules
+            instructions:
+              files:
+                - .gitmodules
+                - docs/guardrails
+                - .github/scaffold
+                - scripts/check-submodule-pins.sh
+            verification:
+              - sh scripts/check-submodule-pins.sh
+            guardrail_refs:
+              - SC-DEP-004
+          - id: AR-PIN-001-T2
+            status: done
+            title: Meet the 1.8.0 Ansible thresholds without a new deviation
+            instructions:
+              files:
+                - roles/docker/meta/main.yml
+                - roles/users/meta/main.yml
+                - roles/permissions/meta/main.yml
+                - roles/group_membership/meta/main.yml
+                - .ansible-lint
+                - scripts/check-ansible-guardrails.py
+            verification:
+              - python3 scripts/check-ansible-guardrails.py
+              - ansible-lint
+            guardrail_refs:
+              - ANSIBLE-LANG-002
+              - ANSIBLE-LINT-003
+
+      - id: AR-CI-002
+        status: done
+        title: Call public ops workflows and keep a token-free Ansible job
+        overview:
+          problem: >-
+            Shell, workflow, Docker, and markdown checks were copied into
+            ci.yml. common-ansible-verify does not exist. commondevops and
+            containerdevops are public now and may become private later.
+          goal: >-
+            ci.yml calls the pinned reusable workflows and passes the read
+            tokens those checkouts use. Dependabot still runs ansible-lint,
+            yamllint, and Molecule without secrets.
+        decision: >-
+          In the context of ops repositories that are public and may become
+          private, we decided to call the pinned workflows and pass
+          COMMONDEVOPS_READ_TOKEN and CONTAINERDEVOPS_READ_TOKEN, to achieve
+          less inline lint while the script checkout can still authenticate,
+          accepting that a later private uses: fails at parse time unless
+          those repositories allow this caller.
+        description: >-
+          This epic does not edit AR-CI-001. That epic stays the record of
+          the earlier call-site plan.
+        out_of_scope:
+          - Publishing this repository's own workflow_call
+          - Sending molecule Dockerfiles through container-build or container-publish
+          - common-ansible-verify, which still does not exist
+        architecture:
+          target: .github/workflows/ci.yml
+          modules:
+            - .github/workflows/ci.yml
+            - scripts/install-lint-tools.sh
+            - scripts/ci-init-guardrails.sh
+        acceptance_criteria:
+          - scripts_ref equals the uses pin for each called workflow
+          - The calls pass checkout_token or scripts_token
+          - Dependabot pull requests still run the lint job
+          - ansible-lint, yamllint, and Molecule stay inline
+        guardrail_refs:
+          - CI-019
+          - CI-024
+          - CI-034
+          - SHELL-LINT-001
+          - DOCKER-LINT-001
+        tasks:
+          - id: AR-CI-002-T1
+            status: done
+            title: Run the token-free lint gates in ci.yml
+            instructions:
+              files:
+                - .github/workflows/ci.yml
+                - scripts/install-lint-tools.sh
+            verification:
+              - sh scripts/install-lint-tools.sh
+              - shellcheck .cursor/install.sh scripts/*.sh
+              - actionlint
+            guardrail_refs:
+              - CI-024
+              - SHELL-LINT-001
+          - id: AR-CI-002-T2
+            status: done
+            title: Replace inline shell, workflow, and doc gates with workflow_call
+            instructions:
+              files:
+                - .github/workflows/ci.yml
+            verification:
+              - >-
+                A public pull request on this repository completes
+                common-infra-lint, common-doc-verify, common-secrets-sast,
+                and container-devcontainer
+              - Each scripts_ref equals that job's uses pin
+            guardrail_refs:
+              - CI-019
+              - CI-034
