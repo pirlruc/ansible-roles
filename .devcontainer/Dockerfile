@@ -26,4 +26,6 @@ RUN "${ANSIBLE_VENV}/bin/pip" install -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt /tmp/requirements.yml
 
 WORKDIR /workspace
+# remoteUser is root for docker-in-docker. See .devcontainer/devcontainer.json.
+# nosemgrep: dockerfile.security.missing-user.missing-user
 CMD ["ansible", "--version"]

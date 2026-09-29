@@ -39,11 +39,15 @@ jobs:
             name="$1"
             token="$2"
             repo="$3"
+            required="$4"
             kind="$(kind_of "$token")"
             if [ -z "$token" ]; then
-              echo "${name} MISSING from Actions repository secrets for ${repo}"
-              echo "${name} note: Dependabot secrets are a separate store and are not visible here"
-              fail=1
+              echo "${name} empty in Actions repository secrets for ${repo}"
+              if [ "$required" = "required" ]; then
+                fail=1
+              else
+                echo "${name} is a Dependabot secret. Actions cannot read that store."
+              fi
               return
             fi
             code="$(curl -sS -o /tmp/probe-body -w '%{http_code}' \
@@ -56,10 +60,10 @@ jobs:
               fail=1
             fi
           }
-          check GUARDRAILS_READ_TOKEN "$GUARDRAILS_READ_TOKEN" pirlruc/guardrails
-          check DEPENDABOT_GITHUB_TOKEN "$DEPENDABOT_GITHUB_TOKEN" pirlruc/guardrails
-          check DEPENDABOT_GITHUB_TOKEN "$DEPENDABOT_GITHUB_TOKEN" pirlruc/github-scaffold
-          check COMMONDEVOPS_READ_TOKEN "$COMMONDEVOPS_READ_TOKEN" pirlruc/commondevops
-          check CONTAINERDEVOPS_READ_TOKEN "$CONTAINERDEVOPS_READ_TOKEN" pirlruc/containerdevops
+          check GUARDRAILS_READ_TOKEN "$GUARDRAILS_READ_TOKEN" pirlruc/guardrails required
+          check DEPENDABOT_GITHUB_TOKEN "$DEPENDABOT_GITHUB_TOKEN" pirlruc/guardrails optional
+          check DEPENDABOT_GITHUB_TOKEN "$DEPENDABOT_GITHUB_TOKEN" pirlruc/github-scaffold optional
+          check COMMONDEVOPS_READ_TOKEN "$COMMONDEVOPS_READ_TOKEN" pirlruc/commondevops required
+          check CONTAINERDEVOPS_READ_TOKEN "$CONTAINERDEVOPS_READ_TOKEN" pirlruc/containerdevops required
           rm -f /tmp/probe-body
           exit "$fail"

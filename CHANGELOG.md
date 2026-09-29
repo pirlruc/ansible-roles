@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pin SLES Molecule package installs to the SLE-BCI 16.0 versions for the
   current base digest and drop the hadolint DL3037 ignore.
+- Give each Dependabot ecosystem a 7-day cooldown.
 - Call commondevops 5.1.2 `common-infra-lint`, `common-doc-verify`, and
   `common-secrets-sast`, and containerdevops 5.0.4 `container-devcontainer`.
   Pass `COMMONDEVOPS_READ_TOKEN` and `CONTAINERDEVOPS_READ_TOKEN` for the
