@@ -78,10 +78,23 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 2. Add Dependabot secret `DEPENDABOT_GITHUB_TOKEN`, then confirm one
    `all-dependencies` PR.
 3. `docker_daemon` (AR-ROLE-002).
-4. Switch inline gates to reusable workflows only after commondevops issue for
-   public callers is solved, and after `common-ansible-verify` exists.
+4. Switch inline gates to reusable workflows only after
+   [commondevops#157](https://github.com/pirlruc/commondevops/issues/157)
+   (public caller) and [commondevops#152](https://github.com/pirlruc/commondevops/issues/152)
+   (`common-ansible-verify`) land.
+   Pin bumps filed as
+   [commondevops#158](https://github.com/pirlruc/commondevops/issues/158)
+   and [containerdevops#122](https://github.com/pirlruc/containerdevops/issues/122).
+   Fixture hadolint:
+   [containerdevops#123](https://github.com/pirlruc/containerdevops/issues/123).
+   Token-free link lint:
+   [github-scaffold#146](https://github.com/pirlruc/github-scaffold/issues/146).
+   Docker-pack scope:
+   [guardrails#181](https://github.com/pirlruc/guardrails/issues/181).
 
 ## Recent history
 
 - 2026-09-29: Pin guardrails 1.8.0 and github-scaffold 1.7.0 as submodules.
   Ansible floor 2.20. Molecule playbooks are in the ansible-lint scope.
+  Companion issues: commondevops#157, commondevops#158, containerdevops#122,
+  containerdevops#123, github-scaffold#146, guardrails#181.
