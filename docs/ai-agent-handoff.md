@@ -9,8 +9,8 @@
 | Remote | https://github.com/pirlruc/ansible-roles (public) |
 | Guardrails | submodule `docs/guardrails` tag **1.8.0** → `aa5184ceaa5d005a71d984fd771564cb10b63681` |
 | Scaffold | submodule `.github/scaffold` tag **1.7.0** → `e76bb3fda306c490b4b3ea5e1a4e3977e04a1a1d` |
-| commondevops pin (tools only) | tag **5.1.2** → `b3c462bed0de4f6475e6be7875c4ababd831acc6` |
-| containerdevops pin (not called) | tag **5.0.4** → `2dd60d34418051fb0505f476d926b20550becfad` |
+| commondevops pin | tag **5.1.2** → `b3c462bed0de4f6475e6be7875c4ababd831acc6` |
+| containerdevops pin | tag **5.0.4** → `2dd60d34418051fb0505f476d926b20550becfad` |
 
 ## Delivery status
 
@@ -20,7 +20,8 @@
 | AR-PIN-001 | Done in tree. Not synced to GitHub issues |
 | AR-ROLE-002 | Open (`docker_daemon`) |
 | AR-CI-001 | Open. Do not edit its GitHub issue |
-| AR-CI-002 | Open. Inline gates stay until a public `workflow_call` path exists |
+| AR-ROLE-003 | Done. Role `git_core` |
+| AR-CI-002 | Done. Public `workflow_call` plus a token-free Ansible job |
 
 `docs/guardrail-deviations.yml` is empty.
 
@@ -56,16 +57,21 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
   thresholds job needs Actions secret `GUARDRAILS_READ_TOKEN` (contents read on
   `pirlruc/guardrails`). Dependabot skips that job (CI-024). The lint job does
   not need the secret.
-- **Private workflow_call.** This repo is public and the owner is a user account.
-  `uses:` of `pirlruc/commondevops` or `pirlruc/containerdevops` does not resolve.
-  Do not add those calls until a public pull request proves they load.
+- **workflow_call visibility.** commondevops and containerdevops are public,
+  so `uses:` resolves. `COMMONDEVOPS_READ_TOKEN` and `CONTAINERDEVOPS_READ_TOKEN`
+  are passed for the script checkout. If those repositories become private
+  again, GitHub rejects the called file before any job reads the token unless
+  the private repository allows this caller. A missing token still has to be
+  reported: while the repos are public, `github.token` can check them out.
 - **Dependabot git submodules.** `.github/dependabot.yml` attaches registry
-  `github-private` to the `gitsubmodule` ecosystem. That stays red until
-  Dependabot secret `DEPENDABOT_GITHUB_TOKEN` exists (not an Actions secret).
+  `github-private` to the `gitsubmodule` ecosystem. Dependabot reads
+  `DEPENDABOT_GITHUB_TOKEN` from the Dependabot secret store only. An Actions
+  workflow cannot see that store, even when the names match.
   Close the old per-ecosystem Dependabot PR after this config is on `main`, or
   the open-PR limit blocks the grouped `all-dependencies` PR.
-- **SLES hadolint.** `molecule/sles-*/Dockerfile` ignore DL3037. The BCI
-  repository has no public package lockfile. Ubuntu lines pin versions.
+- **SLES hadolint.** Molecule Dockerfiles pin `python3`, `shadow`, and `sudo`
+  to the SLE-BCI 16.0 x86_64 product repo versions for base digest
+  `sha256:60c29bd0b778`. Refresh those pins when the base digest changes.
 - **Molecule.** Needs a Docker daemon. `.cursor/install.sh` does not install one.
   Cloud Agents run the lint gates, not Molecule.
 - **Global git insteadOf.** This environment rewrites `https://github.com/` to
@@ -78,10 +84,11 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 2. Add Dependabot secret `DEPENDABOT_GITHUB_TOKEN`, then confirm one
    `all-dependencies` PR.
 3. `docker_daemon` (AR-ROLE-002).
-4. Switch inline gates to reusable workflows only after
+4. `common-ansible-verify` is still
+   [commondevops#152](https://github.com/pirlruc/commondevops/issues/152).
+   Ansible lint and Molecule stay inline until it exists.
    [commondevops#157](https://github.com/pirlruc/commondevops/issues/157)
-   (public caller) and [commondevops#152](https://github.com/pirlruc/commondevops/issues/152)
-   (`common-ansible-verify`) land.
+   tracked the earlier private-caller failure.
    Pin bumps filed as
    [commondevops#158](https://github.com/pirlruc/commondevops/issues/158)
    and [containerdevops#122](https://github.com/pirlruc/containerdevops/issues/122).
@@ -94,6 +101,9 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 
 ## Recent history
 
+- 2026-09-29: Call public commondevops 5.1.2 and containerdevops 5.0.4
+  workflows with the read tokens. Pin SLES zypper package versions. Add
+  role `git_core`.
 - 2026-09-29: Pin guardrails 1.8.0 and github-scaffold 1.7.0 as submodules.
   Ansible floor 2.20. Molecule playbooks are in the ansible-lint scope.
   Companion issues: commondevops#157, commondevops#158, containerdevops#122,

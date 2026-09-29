@@ -41,7 +41,8 @@ jobs:
             repo="$3"
             kind="$(kind_of "$token")"
             if [ -z "$token" ]; then
-              echo "${name} MISSING for ${repo}"
+              echo "${name} MISSING from Actions repository secrets for ${repo}"
+              echo "${name} note: Dependabot secrets are a separate store and are not visible here"
               fail=1
               return
             fi

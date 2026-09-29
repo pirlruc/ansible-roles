@@ -1,4 +1,6 @@
-# Token-free jobs are the Dependabot merge signal (CI-024).
+# The lint job is token-free so Dependabot can merge (CI-024).
+# Reusable jobs pass COMMONDEVOPS_READ_TOKEN and CONTAINERDEVOPS_READ_TOKEN.
+# Those checkouts run only after GitHub loads the called workflow file.
 # docs/guardrails is a private submodule. The thresholds job fetches it with
 # GUARDRAILS_READ_TOKEN and is skipped for dependabot[bot].
 name: ci
@@ -15,6 +17,7 @@ concurrency:
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
   lint:
@@ -43,23 +46,6 @@ jobs:
       - name: Submodule pins
         run: sh scripts/check-submodule-pins.sh
 
-      - name: Install lint tools
-        run: sh scripts/install-lint-tools.sh
-
-      - name: Shellcheck
-        run: shellcheck .cursor/install.sh scripts/*.sh
-
-      - name: actionlint
-        run: actionlint
-
-      - name: zizmor
-        run: |
-          python3 -m pip install 'zizmor==1.29.0'
-          zizmor --offline .github/workflows
-
-      - name: Markdown links
-        run: python3 scripts/lint-doc-links.py
-
       - name: yamllint
         run: yamllint .
 
@@ -68,6 +54,66 @@ jobs:
 
       - name: Syntax-check the orchestrator
         run: ansible-playbook --syntax-check playbooks/orchestrate.yml
+
+  infra-lint:
+    name: common-infra-lint
+    if: github.actor != 'dependabot[bot]'
+    permissions:
+      contents: read
+    uses: pirlruc/commondevops/.github/workflows/common-infra-lint.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
+    with:
+      blocking: true
+      working_directory: .
+      shell_scripts: scripts/*.sh .cursor/install.sh
+      dockerfiles: >-
+        .devcontainer/Dockerfile
+        molecule/ubuntu-accounts/Dockerfile
+        molecule/ubuntu-docker/Dockerfile
+        molecule/sles-accounts/Dockerfile
+        molecule/sles-docker/Dockerfile
+      scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
+    secrets:
+      checkout_token: ${{ secrets.COMMONDEVOPS_READ_TOKEN }}
+
+  docs:
+    name: common-doc-verify
+    if: github.actor != 'dependabot[bot]'
+    permissions:
+      contents: read
+    uses: pirlruc/commondevops/.github/workflows/common-doc-verify.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
+    with:
+      blocking: true
+      run_link_lint: true
+      scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
+    secrets:
+      checkout_token: ${{ secrets.COMMONDEVOPS_READ_TOKEN }}
+
+  secrets-sast:
+    name: common-secrets-sast
+    if: github.actor != 'dependabot[bot]'
+    permissions:
+      contents: read
+      security-events: write
+    uses: pirlruc/commondevops/.github/workflows/common-secrets-sast.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
+    with:
+      blocking: true
+      working_directory: .
+      scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
+    secrets:
+      checkout_token: ${{ secrets.COMMONDEVOPS_READ_TOKEN }}
+
+  devcontainer:
+    name: container-devcontainer
+    if: github.actor != 'dependabot[bot]'
+    permissions:
+      contents: read
+    uses: pirlruc/containerdevops/.github/workflows/container-devcontainer.yml@2dd60d34418051fb0505f476d926b20550becfad
+    with:
+      blocking: true
+      dockerfile: .devcontainer/Dockerfile
+      scripts_ref: 2dd60d34418051fb0505f476d926b20550becfad
+    secrets:
+      scripts_token: ${{ secrets.CONTAINERDEVOPS_READ_TOKEN }}
 
   thresholds:
     name: Guardrail thresholds

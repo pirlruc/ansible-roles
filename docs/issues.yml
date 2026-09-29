@@ -56,6 +56,54 @@ milestones:
               - ANSIBLE-API-001
               - ANSIBLE-LINT-001
 
+      - id: AR-ROLE-003
+        status: done
+        title: Install git-core on Ubuntu and SLES
+        overview:
+          problem: >-
+            Host bootstrap needs git, and Ubuntu publishes git-core as a
+            virtual package while SLES publishes a real package. No role
+            owned that install.
+          goal: >-
+            Role git_core installs git-core, lists no dependencies, and has
+            Molecule coverage on Ubuntu 26.04 and SLES 16.
+        decision: >-
+          In the context of a package that Ubuntu publishes as a virtual name
+          and SLES publishes as a real package, we decided one role that
+          installs git-core on both, to achieve a single call site, accepting
+          that Ubuntu's apt selects the git provider.
+        architecture:
+          target: roles/git_core
+          modules:
+            - roles/git_core
+            - playbooks/orchestrate.yml
+            - molecule/ubuntu-accounts
+            - molecule/sles-accounts
+        acceptance_criteria:
+          - dependencies is an empty list
+          - The role accepts Ubuntu 26.04 and SLES 16 only
+          - Molecule converges the role on both platforms
+        guardrail_refs:
+          - ANSIBLE-API-001
+          - ANSIBLE-TEST-001
+          - ANSIBLE-TEST-002
+          - ANSIBLE-DOC-001
+        tasks:
+          - id: AR-ROLE-003-T1
+            status: done
+            title: Implement git_core and cover it from the account scenarios
+            instructions:
+              files:
+                - roles/git_core/tasks/main.yml
+                - molecule/ubuntu-accounts/converge.yml
+                - molecule/sles-accounts/converge.yml
+            verification:
+              - python3 scripts/check-ansible-guardrails.py
+              - ansible-lint roles/git_core
+            guardrail_refs:
+              - ANSIBLE-API-001
+              - ANSIBLE-TEST-001
+
       - id: AR-ROLE-002
         status: open
         title: Add a docker_daemon role that merges daemon.json
@@ -286,36 +334,31 @@ milestones:
               - ANSIBLE-LINT-003
 
       - id: AR-CI-002
-        status: open
-        title: Keep inline gates until a public caller can use private reusables
+        status: done
+        title: Call public ops workflows and keep a token-free Ansible job
         overview:
           problem: >-
-            commondevops 5.1.2 and containerdevops 5.0.4 are private.
-            ansible-roles is public. A public workflow cannot resolve a
-            private workflow_call, so uses: entries for common-doc-verify,
-            common-infra-lint, common-secrets-sast, common-scaffold-verify,
-            and container-devcontainer would fail before secrets are read.
-            common-ansible-verify does not exist.
+            Shell, workflow, Docker, and markdown checks were copied into
+            ci.yml. common-ansible-verify does not exist. commondevops and
+            containerdevops are public now and may become private later.
           goal: >-
-            Token-free CI still runs ansible-lint, yamllint, shellcheck,
-            actionlint, markdown links, and Molecule. The thresholds job
-            fetches guardrails when GUARDRAILS_READ_TOKEN is set. Reusable
-            calls replace those inline steps only after a public caller path
-            exists.
+            ci.yml calls the pinned reusable workflows and passes the read
+            tokens those checkouts use. Dependabot still runs ansible-lint,
+            yamllint, and Molecule without secrets.
         decision: >-
-          In the context of CI for this public repository, facing private
-          reusable workflows on a personal account, we decided to keep the
-          job bodies inline and pin the same tool versions commondevops
-          5.1.2 installs, to achieve the gates without a workflow file that
-          GitHub cannot load, accepting duplicate steps until commondevops
-          can be called from a public repository.
+          In the context of ops repositories that are public and may become
+          private, we decided to call the pinned workflows and pass
+          COMMONDEVOPS_READ_TOKEN and CONTAINERDEVOPS_READ_TOKEN, to achieve
+          less inline lint while the script checkout can still authenticate,
+          accepting that a later private uses: fails at parse time unless
+          those repositories allow this caller.
         description: >-
           This epic does not edit AR-CI-001. That epic stays the record of
-          the earlier call-site plan. This epic is the later decision for a
-          public caller.
+          the earlier call-site plan.
         out_of_scope:
           - Publishing this repository's own workflow_call
           - Sending molecule Dockerfiles through container-build or container-publish
+          - common-ansible-verify, which still does not exist
         architecture:
           target: .github/workflows/ci.yml
           modules:
@@ -323,13 +366,14 @@ milestones:
             - scripts/install-lint-tools.sh
             - scripts/ci-init-guardrails.sh
         acceptance_criteria:
-          - ci.yml does not uses: a private repository
+          - scripts_ref equals the uses pin for each called workflow
+          - The calls pass checkout_token or scripts_token
           - Dependabot pull requests still run the lint job
-          - shellcheck, actionlint, and hadolint versions match commondevops 5.1.2
+          - ansible-lint, yamllint, and Molecule stay inline
         guardrail_refs:
           - CI-019
           - CI-024
-          - CI-008
+          - CI-034
           - SHELL-LINT-001
           - DOCKER-LINT-001
         tasks:
@@ -348,8 +392,8 @@ milestones:
               - CI-024
               - SHELL-LINT-001
           - id: AR-CI-002-T2
-            status: open
-            title: Replace inline gates with workflow_call when a public path exists
+            status: done
+            title: Replace inline shell, workflow, and doc gates with workflow_call
             instructions:
               files:
                 - .github/workflows/ci.yml
