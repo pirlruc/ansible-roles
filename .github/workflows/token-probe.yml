@@ -1,4 +1,4 @@
-# Presence and private-repo read check for the four named secrets.
+# Presence check for the guardrails read token. The public devops repos do not need a read token.
 # Prints kind and HTTP status only. Does not print secret values.
 name: token-probe
 
@@ -20,9 +20,6 @@ jobs:
       - name: Check Actions secrets and private read
         env:
           GUARDRAILS_READ_TOKEN: ${{ secrets.GUARDRAILS_READ_TOKEN }}
-          DEPENDABOT_GITHUB_TOKEN: ${{ secrets.DEPENDABOT_GITHUB_TOKEN }}
-          COMMONDEVOPS_READ_TOKEN: ${{ secrets.COMMONDEVOPS_READ_TOKEN }}
-          CONTAINERDEVOPS_READ_TOKEN: ${{ secrets.CONTAINERDEVOPS_READ_TOKEN }}
         run: |
           set -euo pipefail
           fail=0
@@ -61,9 +58,5 @@ jobs:
             fi
           }
           check GUARDRAILS_READ_TOKEN "$GUARDRAILS_READ_TOKEN" pirlruc/guardrails required
-          check DEPENDABOT_GITHUB_TOKEN "$DEPENDABOT_GITHUB_TOKEN" pirlruc/guardrails optional
-          check DEPENDABOT_GITHUB_TOKEN "$DEPENDABOT_GITHUB_TOKEN" pirlruc/github-scaffold optional
-          check COMMONDEVOPS_READ_TOKEN "$COMMONDEVOPS_READ_TOKEN" pirlruc/commondevops required
-          check CONTAINERDEVOPS_READ_TOKEN "$CONTAINERDEVOPS_READ_TOKEN" pirlruc/containerdevops required
           rm -f /tmp/probe-body
           exit "$fail"
