@@ -8,7 +8,7 @@
       changed_when: false
       register: compose_version
 
-    - name: daemon.json keeps live restore and no TCP listener
+    - name: Read daemon.json for the live-restore and listener check
       ansible.builtin.slurp:
         src: /etc/docker/daemon.json
       register: docker_daemon_file

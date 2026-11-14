@@ -34,10 +34,14 @@ updates:
     registries:
       - github-private
     multi-ecosystem-group: all-dependencies
+    cooldown:
+      default-days: 7
   - package-ecosystem: pip
     directory: /
     patterns: ["*"]
     multi-ecosystem-group: all-dependencies
+    cooldown:
+      default-days: 7
   - package-ecosystem: gitsubmodule
     directory: /
     patterns: ["*"]
@@ -63,3 +67,5 @@ updates:
     registries:
       - github-private
     multi-ecosystem-group: all-dependencies
+    cooldown:
+      default-days: 7
