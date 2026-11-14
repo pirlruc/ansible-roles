@@ -1,0 +1,29 @@
+- name: Ensure the Docker config directory
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Read the current daemon.json
+  ansible.builtin.slurp:
+    src: /etc/docker/daemon.json
+  register: docker_daemon_current
+  failed_when: false
+  changed_when: false
+
+- name: Merge the hardened daemon.json
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0644"
+    content: "{{ docker_daemon_merged | to_nice_json }}\n"
+  vars:
+    docker_daemon_existing: >-
+      {{ (docker_daemon_current.content | b64decode | from_json)
+         if (docker_daemon_current.content | default('') | length > 0)
+         else {} }}
+    docker_daemon_merged: "{{ docker_daemon_existing | combine(docker_daemon_required, recursive=True) }}"
+  notify: Restart docker
