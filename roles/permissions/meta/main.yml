@@ -8,8 +8,8 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - all
+        - "26.04"
     - name: SLES
       versions:
-        - all
+        - "16"
 dependencies: []

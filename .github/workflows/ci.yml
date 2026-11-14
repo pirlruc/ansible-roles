@@ -57,7 +57,7 @@ jobs:
 
   infra-lint:
     name: common-infra-lint
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
     uses: pirlruc/commondevops/.github/workflows/common-infra-lint.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
@@ -77,7 +77,7 @@ jobs:
 
   docs:
     name: common-doc-verify
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
     uses: pirlruc/commondevops/.github/workflows/common-doc-verify.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
@@ -90,7 +90,7 @@ jobs:
 
   secrets-sast:
     name: common-secrets-sast
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
       security-events: write
@@ -104,7 +104,7 @@ jobs:
 
   devcontainer:
     name: container-devcontainer
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
     uses: pirlruc/containerdevops/.github/workflows/container-devcontainer.yml@2dd60d34418051fb0505f476d926b20550becfad
@@ -117,7 +117,7 @@ jobs:
 
   thresholds:
     name: Guardrail thresholds
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
