@@ -72,8 +72,6 @@ jobs:
         molecule/sles-accounts/Dockerfile
         molecule/sles-docker/Dockerfile
       scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
-    secrets:
-      checkout_token: ${{ secrets.COMMONDEVOPS_READ_TOKEN }}
 
   docs:
     name: common-doc-verify
@@ -85,8 +83,6 @@ jobs:
       blocking: true
       run_link_lint: true
       scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
-    secrets:
-      checkout_token: ${{ secrets.COMMONDEVOPS_READ_TOKEN }}
 
   secrets-sast:
     name: common-secrets-sast
@@ -99,8 +95,6 @@ jobs:
       blocking: true
       working_directory: .
       scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
-    secrets:
-      checkout_token: ${{ secrets.COMMONDEVOPS_READ_TOKEN }}
 
   devcontainer:
     name: container-devcontainer
@@ -112,8 +106,6 @@ jobs:
       blocking: true
       dockerfile: .devcontainer/Dockerfile
       scripts_ref: 2dd60d34418051fb0505f476d926b20550becfad
-    secrets:
-      scripts_token: ${{ secrets.CONTAINERDEVOPS_READ_TOKEN }}
 
   thresholds:
     name: Guardrail thresholds

@@ -3,5 +3,5 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         python3=3.14.3-0ubuntu2 \
-        sudo=1.9.17p2-1ubuntu3.1 \
+        sudo=1.9.17p2-1ubuntu3.2 \
     && rm -rf /var/lib/apt/lists/*
