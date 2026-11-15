@@ -1,0 +1,21 @@
+---
+- name: Seed a daemon.json key the fragment does not mention
+  hosts: all
+  become: true
+  tasks:
+    - name: Create the Docker config directory
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Write an existing runtime key
+      ansible.builtin.copy:
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          {"default-runtime": "runc", "live-restore": false}

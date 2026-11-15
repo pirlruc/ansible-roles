@@ -105,7 +105,7 @@ milestones:
               - ANSIBLE-TEST-001
 
       - id: AR-ROLE-002
-        status: open
+        status: done
         title: Add a docker_daemon role that merges daemon.json
         overview:
           problem: >-
@@ -151,7 +151,7 @@ milestones:
           - ANSIBLE-DOC-001
         tasks:
           - id: AR-ROLE-002-T1
-            status: open
+            status: done
             title: Implement docker_daemon with an empty dependency list
             instructions:
               files:
@@ -169,7 +169,7 @@ milestones:
               - ANSIBLE-API-002
               - ANSIBLE-DOC-001
           - id: AR-ROLE-002-T2
-            status: open
+            status: done
             title: Molecule-test the merge on Ubuntu 26.04 and SLES 16
             instructions:
               files:

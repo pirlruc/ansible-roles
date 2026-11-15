@@ -15,8 +15,8 @@ jobs:
     if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
-    uses: pirlruc/commondevops/.github/workflows/common-token-audit.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
+    uses: pirlruc/commondevops/.github/workflows/common-token-audit.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
     secrets:
       guardrails_token: ${{ secrets.GUARDRAILS_READ_TOKEN }}
     with:
-      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
+      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9

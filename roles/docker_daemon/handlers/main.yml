@@ -2,4 +2,4 @@
   ansible.builtin.service:
     name: docker
     state: restarted
-  when: docker_manage_service | default(true) | bool
+  when: (docker_daemon_manage_service | default(docker_manage_service | default(true))) | bool

@@ -1,3 +1,13 @@
+- name: Require Ubuntu 26.04 or SLES 16
+  ansible.builtin.assert:
+    that:
+      - >-
+        (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_version'] is version('26.04', '=='))
+        or (ansible_facts['distribution'] == 'SLES' and ansible_facts['distribution_major_version'] | int == 16)
+    fail_msg: >-
+      docker_daemon supports Ubuntu 26.04 and SLES 16 only
+      (found {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}).
+
 - name: Ensure the Docker config directory
   ansible.builtin.file:
     path: /etc/docker
