@@ -1,6 +1,6 @@
 # AI agent handoff — ansible-roles
 
-*Last updated: 2026-11-15*
+*Last updated: 2026-11-15 — 1.0.0 changelog is cut. AR-PIN-001 and AR-CI-001 are synced.*
 
 ## Identity
 
@@ -17,9 +17,9 @@
 | Epic | Status |
 |------|--------|
 | AR-ROLE-001 | Done |
-| AR-PIN-001 | Done in tree. Not synced to GitHub issues |
+| AR-PIN-001 | Done. Synced |
 | AR-ROLE-002 | Open (`docker_daemon`) |
-| AR-CI-001 | Done in `docs/issues.yml`. Sync after this branch merges |
+| AR-CI-001 | Done. Synced |
 | AR-ROLE-003 | Done. Role `git_core` |
 | AR-CI-002 | Done. Public `workflow_call` plus a token-free Ansible job |
 
