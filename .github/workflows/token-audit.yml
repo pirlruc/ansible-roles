@@ -1,0 +1,22 @@
+name: token-audit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  audit:
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    permissions:
+      contents: read
+    uses: pirlruc/commondevops/.github/workflows/common-token-audit.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
+    secrets:
+      guardrails_token: ${{ secrets.GUARDRAILS_READ_TOKEN }}
+    with:
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f

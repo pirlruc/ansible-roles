@@ -183,7 +183,7 @@ milestones:
               - ANSIBLE-TEST-002
 
       - id: AR-CI-001
-        status: open
+        status: done
         title: Call commondevops and containerdevops reusable workflows from CI
         overview:
           problem: >-
@@ -195,12 +195,12 @@ milestones:
             published here; org reusable workflows live in commondevops and
             containerdevops.
           goal: >-
-            When COMMONDEVOPS_READ_TOKEN and CONTAINERDEVOPS_READ_TOKEN exist,
-            ci.yml calls the workflows that already exist. When
-            common-ansible-verify is on commondevops main, the inline
-            ansible-lint, yamllint, and Molecule jobs are replaced by that
-            call. Each scripts_ref equals that job's uses pin. Until then the
-            inline workflow stays.
+            ci.yml calls common-doc-verify, common-infra-lint,
+            common-secrets-sast, common-pins-verify, common-scaffold-verify,
+            common-supply-chain, and common-scorecard. common-ansible-verify
+            replaces the inline ansible-lint, yamllint, and Molecule jobs.
+            Each scripts_ref equals that job's uses pin. common-token-audit
+            replaces the inline token probe.
         decision: >-
           In the context of CI for this public role repository, facing private
           reusable workflows, we decided to call commondevops and
@@ -226,10 +226,10 @@ milestones:
           - ci.yml calls common-doc-verify, common-infra-lint, and common-secrets-sast
           - ci.yml calls containerdevops container-devcontainer for .devcontainer/Dockerfile only
           - >-
-            After common-ansible-verify exists, ci.yml calls it for
-            ubuntu-accounts, sles-accounts, ubuntu-docker, and sles-docker
+            ci.yml calls common-ansible-verify for ubuntu-accounts,
+            sles-accounts, ubuntu-docker, and sles-docker
           - Every scripts_ref equals the uses pin on that job
-          - The inline jobs remain on main until that reusable workflow exists
+          - The inline Molecule job is gone
         guardrail_refs:
           - CI-034
           - CI-008
@@ -238,7 +238,7 @@ milestones:
           - ANSIBLE-TEST-001
         tasks:
           - id: AR-CI-001-T1
-            status: open
+            status: done
             title: Call the reusable workflows that already exist
             instructions:
               files:
@@ -251,7 +251,7 @@ milestones:
             guardrail_refs:
               - CI-034
           - id: AR-CI-001-T2
-            status: open
+            status: done
             title: Replace inline ansible-lint and Molecule with common-ansible-verify
             instructions:
               files:

@@ -1,16 +1,16 @@
 # AI agent handoff — ansible-roles
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-11-15*
 
 ## Identity
 
 | Field | Value |
 |-------|-------|
 | Remote | https://github.com/pirlruc/ansible-roles (public) |
-| Guardrails | submodule `docs/guardrails` tag **1.8.0** → `aa5184ceaa5d005a71d984fd771564cb10b63681` |
-| Scaffold | submodule `.github/scaffold` tag **1.7.0** → `e76bb3fda306c490b4b3ea5e1a4e3977e04a1a1d` |
-| commondevops pin | tag **5.1.2** → `b3c462bed0de4f6475e6be7875c4ababd831acc6` |
-| containerdevops pin | tag **5.0.4** → `2dd60d34418051fb0505f476d926b20550becfad` |
+| Guardrails | submodule `docs/guardrails` tag **1.15.0** → `2d4bb70e95449f6922781716857adeb22badf676` |
+| Scaffold | submodule `.github/scaffold` tag **1.12.0** → `9c443ea978851768f451b1df2020dd86dfb1a967` |
+| commondevops pin | tag **6.5.0** → `b4e949f873041940b0a1f0c333270d6e5046b08f` |
+| containerdevops pin | tag **6.5.0** → `b8c0746603eefdc89571b17c62d1e965b28ff31f` |
 
 ## Delivery status
 
@@ -19,7 +19,7 @@
 | AR-ROLE-001 | Done |
 | AR-PIN-001 | Done in tree. Not synced to GitHub issues |
 | AR-ROLE-002 | Open (`docker_daemon`) |
-| AR-CI-001 | Open. Do not edit its GitHub issue |
+| AR-CI-001 | Done in `docs/issues.yml`. Sync after this branch merges |
 | AR-ROLE-003 | Done. Role `git_core` |
 | AR-CI-002 | Done. Public `workflow_call` plus a token-free Ansible job |
 
@@ -55,14 +55,19 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 
 - **Private submodules.** `GITHUB_TOKEN` cannot clone `docs/guardrails`. The
   thresholds job needs Actions secret `GUARDRAILS_READ_TOKEN` (contents read on
-  `pirlruc/guardrails`). Dependabot skips that job (CI-024). The lint job does
-  not need the secret.
-- **workflow_call visibility.** commondevops and containerdevops are public,
-  so `uses:` resolves. `COMMONDEVOPS_READ_TOKEN` and `CONTAINERDEVOPS_READ_TOKEN`
-  are passed for the script checkout. If those repositories become private
-  again, GitHub rejects the called file before any job reads the token unless
-  the private repository allows this caller. A missing token still has to be
-  reported: while the repos are public, `github.token` can check them out.
+  `pirlruc/guardrails`). Dependabot skips that job (CI-024).
+  `common-ansible-verify` passes an empty `check_script` so it does not run
+  the reader that needs the submodule.
+- **Private CI images.** This repo has no `GHCR_READ_TOKEN`. infra-lint,
+  secrets-sast, and supply-chain pass public
+  `ghcr.io/catthehacker/ubuntu:act-24.04` with `mount_runner_git: false`.
+  The called workflow still logs in with `github.token`, which can pull that
+  public image. Do not switch those jobs to `ghcr.io/pirlruc/ci-lint` without
+  a packages read token.
+- **Hashed requirements.** `requirements.txt` is a uv lock with `--hash`
+  lines so `common-ansible-verify` can use `--require-hashes` (CI-039).
+  Direct pins live in `requirements.in`. Recompile with
+  `uv pip compile requirements.in --python 3.13 --generate-hashes --universal -o requirements.txt`.
 - **Dependabot git submodules.** `.github/dependabot.yml` attaches registry
   `github-private` to the `gitsubmodule` ecosystem. Dependabot reads
   `DEPENDABOT_GITHUB_TOKEN` from the Dependabot secret store only. An Actions
@@ -83,10 +88,10 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 1. Add `GUARDRAILS_READ_TOKEN` on this repository if the thresholds job is red.
 2. Add Dependabot secret `DEPENDABOT_GITHUB_TOKEN`, then confirm one
    `all-dependencies` PR.
-3. `docker_daemon` (AR-ROLE-002).
-4. `common-ansible-verify` is still
-   [commondevops#152](https://github.com/pirlruc/commondevops/issues/152).
-   Ansible lint and Molecule stay inline until it exists.
+3. `docker_daemon` (AR-ROLE-002). Molecule proof is the docker scenarios,
+   which import the role. Galaxy metadata stays `all` because ansible-lint
+   `schema[meta]` has no Ubuntu 26.04 entry.
+4. `common-ansible-verify` is called from `ci.yml`.
    [commondevops#157](https://github.com/pirlruc/commondevops/issues/157)
    tracked the earlier private-caller failure.
    Pin bumps filed as
@@ -101,6 +106,9 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 
 ## Recent history
 
+- 2026-11-15: Call commondevops and containerdevops 6.5.0. Molecule, yamllint,
+  and ansible-lint go through `common-ansible-verify`. `token-probe.yml` is
+  replaced by `common-token-audit`. Requirements are hash-locked.
 - 2026-09-29: Call public commondevops 5.1.2 and containerdevops 5.0.4
   workflows with the read tokens. Pin SLES zypper package versions. Add
   role `git_core`.
