@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  role_name: docker_daemon
+  author: pirlruc
+  description: Merge a hardened daemon.json into a Docker host. ANSIBLE-SEC-004.
+  license: MIT
+  min_ansible_version: "2.20"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+    - name: SLES
+      versions:
+        - all
+dependencies: []

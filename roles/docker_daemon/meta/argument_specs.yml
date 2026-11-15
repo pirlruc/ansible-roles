@@ -1,0 +1,12 @@
+---
+argument_specs:
+  main:
+    short_description: Merge a hardened daemon.json into a Docker host.
+    options:
+      docker_daemon_required:
+        type: dict
+        required: false
+        description: >-
+          Keys merged into /etc/docker/daemon.json. The defaults set
+          live-restore, no-new-privileges, and json-file log rotation.
+          The role does not add a TCP listener.

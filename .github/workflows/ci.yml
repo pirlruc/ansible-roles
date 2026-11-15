@@ -1,8 +1,9 @@
-# The lint job is token-free so Dependabot can merge (CI-024).
-# Reusable jobs pass COMMONDEVOPS_READ_TOKEN and CONTAINERDEVOPS_READ_TOKEN.
-# Those checkouts run only after GitHub loads the called workflow file.
-# docs/guardrails is a private submodule. The thresholds job fetches it with
-# GUARDRAILS_READ_TOKEN and is skipped for dependabot[bot].
+# Token-free Ansible job so Dependabot can merge (CI-024).
+# common-ansible-verify installs from requirements.txt with --require-hashes
+# and does not read a secret. The private guardrails submodule is checked
+# only by the thresholds job, which is skipped for dependabot[bot].
+# Container jobs use a public image. This repo has no pull token for the
+# private ci-lint and ci-supply-chain packages.
 name: ci
 
 on:
@@ -17,50 +18,33 @@ concurrency:
 
 permissions:
   contents: read
-  security-events: write
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+  ansible:
+    name: common-ansible-verify
     permissions:
       contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: requirements.txt
-
-      - name: Install toolchain
-        run: pip install -r requirements.txt
-
-      - name: Install collections
-        run: ansible-galaxy collection install -r requirements.yml
-
-      - name: Submodule pins
-        run: sh scripts/check-submodule-pins.sh
-
-      - name: yamllint
-        run: yamllint .
-
-      - name: ansible-lint
-        run: ansible-lint
-
-      - name: Syntax-check the orchestrator
-        run: ansible-playbook --syntax-check playbooks/orchestrate.yml
+    uses: pirlruc/commondevops/.github/workflows/common-ansible-verify.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
+    with:
+      scenarios: |
+        ubuntu-accounts
+        sles-accounts
+        ubuntu-docker
+        sles-docker
+      playbooks: |
+        playbooks/orchestrate.yml
+      # The guardrail reader needs the private submodule. Thresholds runs it.
+      check_script: ""
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
+      blocking: true
 
   infra-lint:
     name: common-infra-lint
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
-    uses: pirlruc/commondevops/.github/workflows/common-infra-lint.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
+      packages: read
+    uses: pirlruc/commondevops/.github/workflows/common-infra-lint.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
     with:
       blocking: true
       working_directory: .
@@ -71,45 +55,109 @@ jobs:
         molecule/ubuntu-docker/Dockerfile
         molecule/sles-accounts/Dockerfile
         molecule/sles-docker/Dockerfile
-      scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
+      container_image: >-
+        ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
+      mount_runner_git: false
 
   docs:
     name: common-doc-verify
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
-    uses: pirlruc/commondevops/.github/workflows/common-doc-verify.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
+    uses: pirlruc/commondevops/.github/workflows/common-doc-verify.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
     with:
       blocking: true
       run_link_lint: true
-      scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
+      run_markdownlint: false
+      run_shfmt: false
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
 
   secrets-sast:
     name: common-secrets-sast
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
+      packages: read
       security-events: write
-    uses: pirlruc/commondevops/.github/workflows/common-secrets-sast.yml@b3c462bed0de4f6475e6be7875c4ababd831acc6
+    uses: pirlruc/commondevops/.github/workflows/common-secrets-sast.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
     with:
       blocking: true
       working_directory: .
-      scripts_ref: b3c462bed0de4f6475e6be7875c4ababd831acc6
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
+      container_image: >-
+        ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
+      mount_runner_git: false
 
   devcontainer:
     name: container-devcontainer
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
-    uses: pirlruc/containerdevops/.github/workflows/container-devcontainer.yml@2dd60d34418051fb0505f476d926b20550becfad
+    uses: pirlruc/containerdevops/.github/workflows/container-devcontainer.yml@b8c0746603eefdc89571b17c62d1e965b28ff31f
     with:
       blocking: true
       dockerfile: .devcontainer/Dockerfile
-      scripts_ref: 2dd60d34418051fb0505f476d926b20550becfad
+      scripts_ref: b8c0746603eefdc89571b17c62d1e965b28ff31f
+
+  pins:
+    name: common-pins-verify
+    permissions:
+      contents: read
+    uses: pirlruc/commondevops/.github/workflows/common-pins-verify.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
+    with:
+      pin_script: scripts/check-submodule-pins.sh
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
+
+  scaffold:
+    name: common-scaffold-verify
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    permissions:
+      contents: read
+      issues: read
+    uses: pirlruc/commondevops/.github/workflows/common-scaffold-verify.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
+    secrets:
+      packs_token: ${{ secrets.GUARDRAILS_READ_TOKEN }}
+    with:
+      blocking: true
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
+
+  supply-chain:
+    name: common-supply-chain
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    permissions:
+      contents: read
+      actions: read
+      packages: read
+      security-events: write
+    uses: pirlruc/commondevops/.github/workflows/common-supply-chain.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
+    with:
+      blocking: true
+      upload_sarif: true
+      working_directory: .
+      scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
+      container_image: >-
+        ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
+      mount_runner_git: false
+
+  scorecard:
+    name: common-scorecard
+    if: >-
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.repository.fork == false
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      security-events: write
+    uses: pirlruc/commondevops/.github/workflows/common-scorecard.yml@b4e949f873041940b0a1f0c333270d6e5046b08f
+    with:
+      blocking: true
+      publish_results: true
 
   thresholds:
     name: Guardrail thresholds
-    if: github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -119,14 +167,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
-          cache: pip
-          cache-dependency-path: requirements.txt
 
       - name: Install toolchain
-        run: pip install -r requirements.txt
+        run: python3 -m pip install --require-hashes -r requirements.txt
 
       - name: Install lint tools
         run: sh scripts/install-lint-tools.sh
@@ -141,40 +187,3 @@ jobs:
 
       - name: Shell and Docker thresholds
         run: sh scripts/check-lint-thresholds.sh
-
-  molecule:
-    name: Molecule
-    needs: lint
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        scenario:
-          - ubuntu-accounts
-          - sles-accounts
-          - ubuntu-docker
-          - sles-docker
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: requirements.txt
-
-      - name: Install toolchain
-        run: pip install -r requirements.txt
-
-      - name: Install collections
-        run: ansible-galaxy collection install -r requirements.yml
-
-      - name: Molecule
-        env:
-          MOLECULE_SCENARIO: ${{ matrix.scenario }}
-        run: molecule test -s "${MOLECULE_SCENARIO}"

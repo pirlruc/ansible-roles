@@ -116,6 +116,10 @@
     path: /run/systemd/system
   register: docker_systemd
 
+- name: Merge the hardened daemon.json
+  ansible.builtin.include_role:
+    name: docker_daemon
+
 - name: Enable and start Docker
   ansible.builtin.service:
     name: docker

@@ -9,3 +9,6 @@
       vars:
         docker_manage_service: false
         docker_verify_cli: true
+    - name: Merge daemon.json again
+      ansible.builtin.import_role:
+        name: docker_daemon

@@ -3,6 +3,8 @@
 # Personal-account private git: Dependabot secret DEPENDABOT_GITHUB_TOKEN
 # (Contents: Read on pirlruc/guardrails and pirlruc/github-scaffold).
 # Actions secrets are not visible to Dependabot (SC-DEP-005).
+# gitsubmodule stays outside the multi-ecosystem group so a registry
+# failure cannot block the other ecosystems (SC-DEP-004).
 
 version: 2
 
@@ -19,6 +21,8 @@ multi-ecosystem-groups:
       interval: monthly
       time: "06:00"
       timezone: Europe/Lisbon
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: build
       include: scope
@@ -27,6 +31,8 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     patterns: ["*"]
+    registries:
+      - github-private
     multi-ecosystem-group: all-dependencies
     cooldown:
       default-days: 7
@@ -39,14 +45,27 @@ updates:
   - package-ecosystem: gitsubmodule
     directory: /
     patterns: ["*"]
-    multi-ecosystem-group: all-dependencies
     registries:
       - github-private
+    schedule:
+      interval: monthly
+      time: "06:00"
+      timezone: Europe/Lisbon
     cooldown:
       default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
   - package-ecosystem: docker
-    directory: /
+    directories:
+      - /.devcontainer
+      - /molecule/ubuntu-accounts
+      - /molecule/ubuntu-docker
+      - /molecule/sles-accounts
+      - /molecule/sles-docker
     patterns: ["*"]
+    registries:
+      - github-private
     multi-ecosystem-group: all-dependencies
     cooldown:
       default-days: 7

@@ -8,6 +8,19 @@
       changed_when: false
       register: compose_version
 
+    - name: Read daemon.json for the live-restore and listener check
+      ansible.builtin.slurp:
+        src: /etc/docker/daemon.json
+      register: docker_daemon_file
+
+    - name: The daemon config matches ANSIBLE-SEC-004
+      ansible.builtin.assert:
+        that:
+          - (docker_daemon_file.content | b64decode | from_json)['live-restore'] | bool
+          - (docker_daemon_file.content | b64decode | from_json)['no-new-privileges'] | bool
+          - "'tcp://' not in (docker_daemon_file.content | b64decode)"
+        quiet: true
+
     - name: Compose reported a version
       ansible.builtin.assert:
         that:
