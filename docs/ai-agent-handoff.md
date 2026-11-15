@@ -1,6 +1,6 @@
 # AI agent handoff — ansible-roles
 
-*Last updated: 2026-11-15 — 1.0.0 changelog is cut. AR-PIN-001 and AR-CI-001 are synced.*
+*Last updated: 2026-11-15 — 1.0.0 is tagged and the GitHub release is published. AR-ROLE-002 stays open.*
 
 ## Identity
 
