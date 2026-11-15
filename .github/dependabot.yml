@@ -61,11 +61,13 @@ updates:
       - /.devcontainer
       - /molecule/ubuntu-accounts
       - /molecule/ubuntu-docker
+      - /molecule/ubuntu-docker-daemon
       - /molecule/sles-accounts
       - /molecule/sles-docker
+      - /molecule/sles-docker-daemon
     patterns: ["*"]
-    registries:
-      - github-private
+    # github-private is a git registry. Attaching it makes Dependabot
+    # authenticate registry.suse.com with that token and fail.
     multi-ecosystem-group: all-dependencies
     cooldown:
       default-days: 7

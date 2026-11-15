@@ -54,4 +54,6 @@ hadolint --failure-threshold "${threshold}" \
   molecule/ubuntu-accounts/Dockerfile \
   molecule/ubuntu-docker/Dockerfile \
   molecule/sles-accounts/Dockerfile \
-  molecule/sles-docker/Dockerfile
+  molecule/sles-docker/Dockerfile \
+  molecule/ubuntu-docker-daemon/Dockerfile \
+  molecule/sles-docker-daemon/Dockerfile

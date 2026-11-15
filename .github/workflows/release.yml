@@ -1,0 +1,19 @@
+name: release
+
+on:
+  push:
+    tags: ["1.*"]
+
+permissions: {}
+
+jobs:
+  publish:
+    permissions:
+      contents: write
+    uses: pirlruc/commondevops/.github/workflows/common-release.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9 # v6.5.0
+    with:
+      tag: ${{ github.ref_name }}
+      attach_sbom: false
+      sign: false
+    secrets:
+      release_token: ${{ secrets.RELEASE_TOKEN }}

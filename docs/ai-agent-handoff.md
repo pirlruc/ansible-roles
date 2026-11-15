@@ -1,6 +1,6 @@
 # AI agent handoff — ansible-roles
 
-*Last updated: 2026-11-15 — 1.0.0 is tagged and the GitHub release is published. AR-ROLE-002 stays open.*
+*Last updated: 2026-11-15 — docker_daemon asserts Ubuntu 26.04 and SLES 16 and has its own Molecule scenarios. release.yml calls common-release. Dependabot docker no longer attaches the git registry. 1.1.0 is not tagged.*
 
 ## Identity
 
@@ -9,7 +9,7 @@
 | Remote | https://github.com/pirlruc/ansible-roles (public) |
 | Guardrails | submodule `docs/guardrails` tag **1.15.0** → `2d4bb70e95449f6922781716857adeb22badf676` |
 | Scaffold | submodule `.github/scaffold` tag **1.12.0** → `9c443ea978851768f451b1df2020dd86dfb1a967` |
-| commondevops pin | tag **6.5.0** → `b4e949f873041940b0a1f0c333270d6e5046b08f` |
+| commondevops pin | tag **v6.5.0** → `ee91ea75b6f60bc55ec5a95e1692865ee96485e9` |
 | containerdevops pin | tag **6.5.0** → `b8c0746603eefdc89571b17c62d1e965b28ff31f` |
 
 ## Delivery status
@@ -18,7 +18,7 @@
 |------|--------|
 | AR-ROLE-001 | Done |
 | AR-PIN-001 | Done. Synced |
-| AR-ROLE-002 | Open (`docker_daemon`) |
+| AR-ROLE-002 | Done in the manifest. Sync after the pull request merges. |
 | AR-CI-001 | Done. Synced |
 | AR-ROLE-003 | Done. Role `git_core` |
 | AR-CI-002 | Done. Public `workflow_call` plus a token-free Ansible job |
@@ -42,6 +42,8 @@ sh scripts/check-lint-thresholds.sh
 yamllint .
 ansible-lint
 ansible-playbook --syntax-check playbooks/orchestrate.yml
+molecule test -s ubuntu-docker-daemon
+molecule test -s sles-docker-daemon
 ```
 
 `scripts/lint-doc-links.py` is vendored from methodologies **1.7.0**
@@ -70,11 +72,11 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
   Direct pins live in `requirements.in`. Recompile with
   `uv pip compile requirements.in --python 3.13 --generate-hashes --universal -o requirements.txt`.
 - **Dependabot git submodules.** `.github/dependabot.yml` attaches registry
-  `github-private` to the `gitsubmodule` ecosystem. Dependabot reads
+  `github-private` to the `gitsubmodule` and `github-actions` ecosystems.
+  The docker ecosystem does not attach it. That git token made
+  registry.suse.com fail as a private source. Dependabot reads
   `DEPENDABOT_GITHUB_TOKEN` from the Dependabot secret store only. An Actions
   workflow cannot see that store, even when the names match.
-  Close the old per-ecosystem Dependabot PR after this config is on `main`, or
-  the open-PR limit blocks the grouped `all-dependencies` PR.
 - **SLES hadolint.** Molecule Dockerfiles pin `python3`, `shadow`, and `sudo`
   to the SLE-BCI 16.0 x86_64 product repo versions for base digest
   `sha256:60c29bd0b778`. Refresh those pins when the base digest changes.
@@ -87,14 +89,13 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 ## Suggested next work
 
 1. Add `GUARDRAILS_READ_TOKEN` on this repository if the thresholds job is red.
-2. Add Dependabot secret `DEPENDABOT_GITHUB_TOKEN`, then confirm one
-   `all-dependencies` PR.
-3. `docker_daemon` (AR-ROLE-002). Molecule proof is the docker scenarios,
-   which import the role. Galaxy metadata stays `all` because ansible-lint
-   `schema[meta]` has no Ubuntu 26.04 entry.
-4. `common-ansible-verify` is called from `ci.yml`.
-   [commondevops#157](https://github.com/pirlruc/commondevops/issues/157)
-   tracked the earlier private-caller failure.
+2. Confirm the next docker Dependabot update no longer reports
+   `private_source_authentication_failure` for `registry.suse.com`.
+3. Tag `1.1.0` after this pull request merges. `release.yml` pins
+   commondevops `v6.5.0` (`ee91ea75`). A GitHub Release was not created for
+   that tag, so the CI images were not republished.
+4. Galaxy metadata stays `all` because ansible-lint `schema[meta]` has no
+   Ubuntu 26.04 entry. The tasks assert the release.
    Pin bumps filed as
    [commondevops#158](https://github.com/pirlruc/commondevops/issues/158)
    and [containerdevops#122](https://github.com/pirlruc/containerdevops/issues/122).

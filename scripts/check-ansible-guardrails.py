@@ -15,8 +15,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 THRESHOLDS = ROOT / "docs" / "guardrails" / "ansible" / "profile.thresholds.yml"
 ROLES = ("docker", "docker_daemon", "users", "permissions", "group_membership", "git_core")
 SCENARIOS = {
-    "ubuntu-26.04": ("ubuntu-accounts", "ubuntu-docker"),
-    "sles-16": ("sles-accounts", "sles-docker"),
+    "ubuntu-26.04": ("ubuntu-accounts", "ubuntu-docker", "ubuntu-docker-daemon"),
+    "sles-16": ("sles-accounts", "sles-docker", "sles-docker-daemon"),
 }
 
 

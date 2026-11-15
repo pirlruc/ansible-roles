@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-15
+
+### Added
+
+- `docker_daemon` refuses any host that is not Ubuntu 26.04 or SLES 16.
+  Molecule covers the merge on both, including a key the fragment does not mention.
+- `release.yml` publishes a GitHub Release from an annotated `1.*` tag.
+- Callers pin commondevops `v6.5.0`.
+
+### Fixed
+
+- The thresholds job pins `ubuntu-24.04`.
+- Dependabot's docker update no longer sends the git registry token to registry.suse.com.
+
 ## [1.0.0] - 2026-11-15
 
 ### Added

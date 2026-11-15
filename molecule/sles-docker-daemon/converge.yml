@@ -1,0 +1,10 @@
+---
+- name: Merge daemon.json without installing packages
+  hosts: all
+  become: true
+  tasks:
+    - name: Merge the hardened daemon.json
+      ansible.builtin.import_role:
+        name: docker_daemon
+      vars:
+        docker_daemon_manage_service: false

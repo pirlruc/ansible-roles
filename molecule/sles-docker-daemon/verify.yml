@@ -1,0 +1,17 @@
+---
+- name: Verify the merge kept the existing key and overlaid live-restore
+  hosts: all
+  tasks:
+    - name: Read daemon.json
+      ansible.builtin.slurp:
+        src: /etc/docker/daemon.json
+      register: docker_daemon_file
+
+    - name: The fragment overlays and the untouched key survives
+      ansible.builtin.assert:
+        that:
+          - (docker_daemon_file.content | b64decode | from_json)['default-runtime'] == 'runc'
+          - (docker_daemon_file.content | b64decode | from_json)['live-restore'] | bool
+          - (docker_daemon_file.content | b64decode | from_json)['no-new-privileges'] | bool
+          - "'tcp://' not in (docker_daemon_file.content | b64decode)"
+        quiet: true

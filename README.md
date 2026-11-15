@@ -49,7 +49,7 @@ molecule test -s ubuntu-accounts
 molecule test -s sles-accounts
 ```
 
-Docker install scenarios (`ubuntu-docker`, `sles-docker`) pull upstream packages and need network.
+Docker install scenarios (`ubuntu-docker`, `sles-docker`) pull upstream packages and need network. `ubuntu-docker-daemon` and `sles-docker-daemon` only merge `daemon.json`.
 
 ## Example
 
