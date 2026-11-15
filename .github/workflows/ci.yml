@@ -56,7 +56,8 @@ jobs:
         molecule/sles-accounts/Dockerfile
         molecule/sles-docker/Dockerfile
       scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
-      container_image: ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
+      container_image: >-
+        ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
       mount_runner_git: false
 
   docs:
@@ -84,7 +85,8 @@ jobs:
       blocking: true
       working_directory: .
       scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
-      container_image: ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
+      container_image: >-
+        ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
       mount_runner_git: false
 
   devcontainer:
@@ -134,7 +136,8 @@ jobs:
       upload_sarif: true
       working_directory: .
       scripts_ref: b4e949f873041940b0a1f0c333270d6e5046b08f
-      container_image: ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
+      container_image: >-
+        ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
       mount_runner_git: false
 
   scorecard:

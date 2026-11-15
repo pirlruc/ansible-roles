@@ -63,7 +63,8 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
   `ghcr.io/catthehacker/ubuntu:act-24.04` with `mount_runner_git: false`.
   The called workflow still logs in with `github.token`, which can pull that
   public image. Do not switch those jobs to `ghcr.io/pirlruc/ci-lint` without
-  a packages read token.
+  a packages read token. Fold the digest onto the next line. Yamllint's
+  120-character limit rejects it on one line.
 - **Hashed requirements.** `requirements.txt` is a uv lock with `--hash`
   lines so `common-ansible-verify` can use `--require-hashes` (CI-039).
   Direct pins live in `requirements.in`. Recompile with
@@ -106,7 +107,8 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 
 ## Recent history
 
-- 2026-11-15: Call commondevops and containerdevops 6.5.0. Molecule, yamllint,
+- 2026-11-15: Fold the public CI image digest so yamllint's 120-character
+  limit passes. Call commondevops and containerdevops 6.5.0. Molecule, yamllint,
   and ansible-lint go through `common-ansible-verify`. `token-probe.yml` is
   replaced by `common-token-audit`. Requirements are hash-locked.
 - 2026-09-29: Call public commondevops 5.1.2 and containerdevops 5.0.4
