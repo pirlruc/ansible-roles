@@ -3,6 +3,7 @@
 ignore: |
   .github/scaffold/
   docs/guardrails/
+  .venv/
 
 extends: default
 rules:
