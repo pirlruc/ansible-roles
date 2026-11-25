@@ -5,7 +5,7 @@ cd "$(git rev-parse --show-toplevel)"
 
 if [[ ! -d .venv ]]; then
   python3 -m venv .venv
-  .venv/bin/pip install -r requirements.txt
+  .venv/bin/pip install --require-hashes -r requirements.txt
 fi
 .venv/bin/ansible-galaxy collection install -r requirements.yml
 sh scripts/check-submodule-pins.sh
