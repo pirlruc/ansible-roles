@@ -24,7 +24,7 @@ jobs:
     name: common-ansible-verify
     permissions:
       contents: read
-    uses: pirlruc/commondevops/.github/workflows/common-ansible-verify.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-ansible-verify.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     with:
       scenarios: |
         ubuntu-accounts
@@ -37,7 +37,7 @@ jobs:
         playbooks/orchestrate.yml
       # The guardrail reader needs the private submodule. Thresholds runs it.
       check_script: ""
-      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
       blocking: true
 
   infra-lint:
@@ -46,7 +46,7 @@ jobs:
     permissions:
       contents: read
       packages: read
-    uses: pirlruc/commondevops/.github/workflows/common-infra-lint.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-infra-lint.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     with:
       blocking: true
       working_directory: .
@@ -59,7 +59,7 @@ jobs:
         molecule/sles-docker/Dockerfile
         molecule/ubuntu-docker-daemon/Dockerfile
         molecule/sles-docker-daemon/Dockerfile
-      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
       container_image: >-
         ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
       mount_runner_git: false
@@ -69,13 +69,13 @@ jobs:
     if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
-    uses: pirlruc/commondevops/.github/workflows/common-doc-verify.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-doc-verify.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     with:
       blocking: true
       run_link_lint: true
       run_markdownlint: false
       run_shfmt: false
-      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
 
   secrets-sast:
     name: common-secrets-sast
@@ -84,11 +84,11 @@ jobs:
       contents: read
       packages: read
       security-events: write
-    uses: pirlruc/commondevops/.github/workflows/common-secrets-sast.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-secrets-sast.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     with:
       blocking: true
       working_directory: .
-      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
       container_image: >-
         ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
       mount_runner_git: false
@@ -98,20 +98,20 @@ jobs:
     if: github.event.pull_request.user.login != 'dependabot[bot]'
     permissions:
       contents: read
-    uses: pirlruc/containerdevops/.github/workflows/container-devcontainer.yml@b8c0746603eefdc89571b17c62d1e965b28ff31f
+    uses: pirlruc/containerdevops/.github/workflows/container-devcontainer.yml@b1cf0dead2b1a501bf1433fe72cdbbdad4e9132d
     with:
       blocking: true
       dockerfile: .devcontainer/Dockerfile
-      scripts_ref: b8c0746603eefdc89571b17c62d1e965b28ff31f
+      scripts_ref: b1cf0dead2b1a501bf1433fe72cdbbdad4e9132d
 
   pins:
     name: common-pins-verify
     permissions:
       contents: read
-    uses: pirlruc/commondevops/.github/workflows/common-pins-verify.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-pins-verify.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     with:
       pin_script: scripts/check-submodule-pins.sh
-      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
 
   scaffold:
     name: common-scaffold-verify
@@ -119,12 +119,12 @@ jobs:
     permissions:
       contents: read
       issues: read
-    uses: pirlruc/commondevops/.github/workflows/common-scaffold-verify.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-scaffold-verify.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     secrets:
       packs_token: ${{ secrets.GUARDRAILS_READ_TOKEN }}
     with:
       blocking: true
-      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
 
   supply-chain:
     name: common-supply-chain
@@ -134,12 +134,12 @@ jobs:
       actions: read
       packages: read
       security-events: write
-    uses: pirlruc/commondevops/.github/workflows/common-supply-chain.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-supply-chain.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     with:
       blocking: true
       upload_sarif: true
       working_directory: .
-      scripts_ref: ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
       container_image: >-
         ghcr.io/catthehacker/ubuntu:act-24.04@sha256:dff4ec57d90046a7283aafc314298380be82bfeccb9ad0f1b36c4ebe74aabe78
       mount_runner_git: false
@@ -154,7 +154,7 @@ jobs:
       actions: read
       id-token: write
       security-events: write
-    uses: pirlruc/commondevops/.github/workflows/common-scorecard.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9
+    uses: pirlruc/commondevops/.github/workflows/common-scorecard.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
     with:
       blocking: true
       publish_results: true

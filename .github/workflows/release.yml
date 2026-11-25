@@ -10,7 +10,7 @@ jobs:
   publish:
     permissions:
       contents: write
-    uses: pirlruc/commondevops/.github/workflows/common-release.yml@ee91ea75b6f60bc55ec5a95e1692865ee96485e9 # v6.5.0
+    uses: pirlruc/commondevops/.github/workflows/common-release.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5 # v6.12.0
     with:
       tag: ${{ github.ref_name }}
       attach_sbom: false

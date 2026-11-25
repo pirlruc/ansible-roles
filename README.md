@@ -12,13 +12,14 @@ Platforms: Ubuntu 26.04 and SLES 16.
 | `permissions` | Set path mode/owner and `/etc/sudoers.d` drop-ins | Create accounts |
 | `group_membership` | Add or remove users on an existing group | Create the group or the user |
 | `docker` | Install Docker Engine and Compose v2 | Create users or add them to the `docker` group |
+| `docker_daemon` | Merge keys into the existing `/etc/docker/daemon.json` | Install Docker Engine or add a TCP listener |
 | `git_core` | Install the `git-core` package | Configure remotes, credentials, or identity |
 
 `playbooks/orchestrate.yml` runs account, permissions, and group membership, then Docker, then a second `group_membership` pass so users can join the `docker` group the package creates. It installs `git-core` when `orchestrator_install_git` is true. On Ubuntu 26.04 that name is a virtual package provided by `git`. On SLES 16 it is the real package.
 
 ## Guardrails
 
-[pirlruc/guardrails](https://github.com/pirlruc/guardrails) tag **1.8.0** (`aa5184ceaa5d005a71d984fd771564cb10b63681`) is the `docs/guardrails` submodule. [pirlruc/github-scaffold](https://github.com/pirlruc/github-scaffold) tag **1.7.0** (`e76bb3fda306c490b4b3ea5e1a4e3977e04a1a1d`) is the `.github/scaffold` submodule. CI reads `docs/guardrails/ansible/profile.thresholds.yml` and fails closed when a key is missing. `docs/guardrail-deviations.yml` is empty.
+[pirlruc/guardrails](https://github.com/pirlruc/guardrails) tag **1.17.1** (`8508e93691aa3c4f769ecc215ddc83ecf26e70b2`) is the `docs/guardrails` submodule. [pirlruc/github-scaffold](https://github.com/pirlruc/github-scaffold) tag **1.14.3** (`1fca8a3b79c10d38d5b39747d2363070a07503da`) is the `.github/scaffold` submodule. CI reads `docs/guardrails/ansible/profile.thresholds.yml` and fails closed when a key is missing. `docs/guardrail-deviations.yml` is empty.
 
 ```sh
 git submodule update --init --recursive

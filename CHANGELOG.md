@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- MIT `LICENSE`. The copyright holder is The ansible-roles authors.
+- `SECURITY.md` sends vulnerability reports to GitHub private vulnerability reporting on this repository.
+
+### Changed
+
+- `scripts/check-ci-local.sh` installs Python dependencies with `pip install --require-hashes`.
+- `codeql.yml` calls `common-codeql` for the actions language.
+- Pins are guardrails 1.17.1, github-scaffold 1.14.3, commondevops v6.12.0, and containerdevops 6.10.0.
+
 ## [1.1.0] - 2026-11-15
 
 ### Added
