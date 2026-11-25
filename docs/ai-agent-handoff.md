@@ -112,7 +112,9 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
    Do not attach `github-private` to docker.
 3. Tag `1.1.0` exists on the remote (`5e0263eb`) and the GitHub Release
    `1.1.0` was published 2026-11-15. Do not create that tag again.
-   `release.yml` pins commondevops `v6.12.0` (`ff65e7ef`).
+   `1.1.1` is the changelog heading for the license, hashed pip install,
+   and actions CodeQL. Cut the annotated tag only after that heading is
+   on `main`. `release.yml` pins commondevops `v6.12.0` (`ff65e7ef`).
 4. Enable private vulnerability reporting so the `SECURITY.md` URL accepts
    reports. That is a repository setting.
 5. Galaxy metadata stays `all` because ansible-lint `schema[meta]` has no
@@ -129,6 +131,8 @@ python3 .github/scaffold/scripts/issues-sync.py --yaml docs/issues.yml --validat
 
 ## Recent history
 
+- 2026-11-25: Close changelog `1.1.1` for the license, hashed pip install,
+  and the actions CodeQL workflow. The annotated tag follows the merge.
 - 2026-11-24: Root MIT `LICENSE` and `SECURITY.md`. Local pip install passes
   `--require-hashes` against the existing hashed `requirements.txt`. Pins
   are guardrails 1.17.1 and github-scaffold 1.14.3. `codeql.yml` calls
