@@ -159,6 +159,18 @@ jobs:
       blocking: true
       publish_results: true
 
+  drift:
+    name: common-threshold-drift
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    permissions:
+      contents: read
+    uses: pirlruc/commondevops/.github/workflows/common-threshold-drift.yml@ff65e7efbb7eea67bd659f886db0adb399f3a3f5
+    secrets:
+      checkout_token: ${{ secrets.GUARDRAILS_READ_TOKEN }}
+    with:
+      scripts_ref: ff65e7efbb7eea67bd659f886db0adb399f3a3f5
+      drift_script: scripts/check-threshold-drift.sh
+
   thresholds:
     name: Guardrail thresholds
     if: github.event.pull_request.user.login != 'dependabot[bot]'

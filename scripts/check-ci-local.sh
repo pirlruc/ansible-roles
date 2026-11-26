@@ -9,6 +9,7 @@ if [[ ! -d .venv ]]; then
 fi
 .venv/bin/ansible-galaxy collection install -r requirements.yml
 sh scripts/check-submodule-pins.sh
+sh scripts/check-threshold-drift.sh
 .venv/bin/yamllint .
 .venv/bin/ansible-lint
 .venv/bin/ansible-playbook --syntax-check playbooks/orchestrate.yml
