@@ -1,6 +1,6 @@
 # AI agent handoff — ansible-roles
 
-*Last updated: 2026-11-24 — MIT LICENSE and SECURITY.md are in the tree. Local pip install uses --require-hashes. Pins are guardrails 1.17.1, scaffold 1.14.3, commondevops v6.12.0, and containerdevops 6.10.0. CodeQL calls common-codeql for the actions language. Dependabot docker still fails on registry.suse.com; the docker entry does not attach a registry.*
+*Last updated: 2026-11-26 — CI calls common-threshold-drift. Main requires the existing CI checks and private vulnerability reporting is enabled.*
 
 ## Identity
 
